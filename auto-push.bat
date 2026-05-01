@@ -1,4 +1,4 @@
-
+@echo off
 cd /d C:\Users\danfl\OneDrive\Stuff\gspro-dashboard-project
 
 :: Add all changed files
@@ -8,5 +8,4 @@ git add .
 git commit -m "Auto-update: %date% %time%"
 
 :: Push to the repo
-git push origin main
-pause
+git push -f origin main
