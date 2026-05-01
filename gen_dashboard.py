@@ -687,6 +687,9 @@ main { display:flex; flex-direction:column; gap:18px; min-width:0; }
 /* ── Chart cards ─────────────────────────────────────────── */
 .chart-card { padding:18px 20px 20px; }
 .chart-card canvas { max-height:340px; }
+.trend-chart-wrap { position:relative; width:100%; height:340px; }
+.trend-chart-wrap > canvas { width:100% !important; height:100% !important; max-height:none; display:block; }
+@media(max-width:760px){ .trend-chart-wrap { height:280px; } }
 
 /* ── H2H ─────────────────────────────────────────────────── */
 .h2h-layout { display:grid; grid-template-columns:1fr 380px; gap:14px; }
@@ -878,7 +881,7 @@ footer .fl { display:flex; align-items:center; gap:8px; }
     <!-- Score Journey -->
     <section aria-labelledby="sj-title">
       <div class="section-title" id="sj-title"><span class="st-accent">Score Journey</span><span class="panel-sub" style="margin-left:auto;text-transform:none;letter-spacing:0">18-hole rounds · dashed line = overall trend</span></div>
-      <div class="panel chart-card glow"><canvas id="trendChart" style="max-height:340px"></canvas></div>
+      <div class="panel chart-card glow"><div class="trend-chart-wrap"><canvas id="trendChart"></canvas></div></div>
     </section>
 
     <!-- Deep Dive -->
@@ -1435,7 +1438,7 @@ function initTrendChart() {
     type: 'scatter',
     data: { datasets: buildTrendDatasets() },
     options: {
-      responsive: true, maintainAspectRatio: true,
+      responsive: true, maintainAspectRatio: false,
       animation: { duration: 300 },
       parsing: false,
       scales: {
