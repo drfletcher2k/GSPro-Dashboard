@@ -1,0 +1,7 @@
+.env
+.cookies
+data/raw.json
+data/filtered.json
+data/transformed.json
+__pycache__/
+*.pyc
