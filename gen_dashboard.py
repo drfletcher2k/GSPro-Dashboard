@@ -294,6 +294,47 @@ PERP_J     = jd(per_player)
 H2H_J      = jd(h2h_matrix)
 COURSES_J  = jd(top_courses)
 MONTHLY_J  = jd(monthly)
+
+# ── recent sessions (for Option A feed + Option C deep-dive) ─────────────────
+def _safe_pct(num, den):
+    try:
+        return round(int(num) / int(den) * 100) if den and int(den) > 0 else None
+    except (TypeError, ValueError):
+        return None
+
+_sessions_by_id = defaultdict(list)
+for _r in rounds:
+    _sessions_by_id[_r['roundId']].append(_r)
+
+_session_list = []
+for _rid, _entries in _sessions_by_id.items():
+    if len(_entries) < 2:
+        continue
+    _date = max(e['date'] for e in _entries if e.get('date')) or ''
+    _course = _entries[0].get('course', '')
+    _players = sorted(_entries, key=lambda e: (e.get('score') or 999))
+    _session_list.append({
+        'roundId': _rid,
+        'date': _date,
+        'course': _course,
+        'players': [{
+            'player':   e['player'],
+            'score':    e.get('score'),
+            'net':      e.get('net'),
+            'birdies':  e.get('birdies', 0),
+            'pars':     e.get('pars', 0),
+            'bogeys':   e.get('bogeys', 0),
+            'doubles':  e.get('doubleBogeys', 0),
+            'others':   e.get('others', 0),
+            'gir_pct':  _safe_pct(e.get('greensInReg', 0), e.get('greensTarget')),
+            'fir_pct':  _safe_pct(e.get('fairwaysHit', 0), e.get('fairwaysTarget')),
+            'driving':  round(float(e['drivingDistLongest'])) if e.get('drivingDistLongest') else None,
+        } for e in _players],
+    })
+
+_session_list.sort(key=lambda s: s['date'], reverse=True)
+RECENT_SESSIONS_J = jd(_session_list[:10])
+
 GENERATED     = datetime.now().strftime('%Y-%m-%d %H:%M')
 GENERATED_ISO = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
 
@@ -565,66 +606,59 @@ main { display:flex; flex-direction:column; gap:18px; min-width:0; }
 .kpi-value { font-family:'Space Grotesk', sans-serif; font-size:1.45rem; font-weight:700; line-height:1.1; letter-spacing:-0.01em; }
 .kpi-sub   { font-size:0.7rem; color:var(--muted-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
-/* ── Hero (stage) row ────────────────────────────────────── */
-.stage {
-  display:grid;
-  grid-template-columns: 1.7fr 1fr 1fr;
-  gap:14px;
+/* ── Recent Sessions Feed (Option A) ────────────────────── */
+.sessions-feed {
+  display:flex; gap:12px; overflow-x:auto; padding-bottom:6px;
+  scrollbar-width:thin; scrollbar-color:rgba(99,140,210,.25) transparent;
 }
-@media(max-width:1280px){ .stage { grid-template-columns: 1fr 1fr; } .stage .stage-feature { grid-column: 1/-1; } }
-@media(max-width:760px){  .stage { grid-template-columns: 1fr; } }
-.stage-feature {
-  padding:24px 26px;
-  position:relative;
-  background:
-    radial-gradient(ellipse 60% 100% at 100% 50%, rgba(79,139,255,0.18) 0%, transparent 60%),
-    linear-gradient(180deg, rgba(15,23,42,0.95), rgba(10,16,32,0.95));
-  display:flex; flex-direction:column; gap:14px;
-  min-height:240px;
+.sessions-feed::-webkit-scrollbar { height:4px; }
+.sessions-feed::-webkit-scrollbar-thumb { background:rgba(99,140,210,.25); border-radius:2px; }
+.session-card {
+  flex:0 0 210px; min-width:0;
+  border-radius:12px; padding:14px 16px;
+  display:flex; flex-direction:column; gap:10px;
+  border-top-width:3px; border-top-style:solid;
+  transition:transform .15s, box-shadow .15s;
 }
-.stage-feature::before {
-  content:''; position:absolute; right:-40px; top:-40px;
-  width:240px; height:240px; border-radius:50%;
-  background: radial-gradient(circle, rgba(79,139,255,0.45), transparent 70%);
-  filter: blur(28px); pointer-events:none;
-}
-.feature-eyebrow {
-  font-size:0.65rem; color:var(--accent-2); letter-spacing:0.18em; text-transform:uppercase; font-weight:600;
-}
-.feature-name {
-  font-family:'Space Grotesk','Inter',sans-serif;
-  font-size:2.4rem; font-weight:700; letter-spacing:-0.02em; line-height:1.05;
-}
-.feature-tag { font-size:0.78rem; color:var(--text-dim); max-width:300px; }
-.feature-stats { display:flex; gap:24px; margin-top:auto; flex-wrap:wrap; }
-.feature-stat .fs-label { font-size:0.62rem; color:var(--muted); letter-spacing:0.14em; text-transform:uppercase; }
-.feature-stat .fs-value { font-family:'Space Grotesk',sans-serif; font-size:1.2rem; font-weight:700; }
-.feature-cta {
-  align-self:flex-start;
-  padding:9px 16px; border-radius:10px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  color:#fff; font-size:0.78rem; font-weight:600; letter-spacing:0.04em;
-  border:none; cursor:pointer;
-  box-shadow: 0 0 24px -6px var(--accent-glow);
-  transition: transform .15s, box-shadow .15s;
-}
-.feature-cta:hover { transform:translateY(-1px); box-shadow:0 0 28px -4px var(--accent-glow); }
+.session-card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.35); }
+.sc-date  { font-size:0.6rem; color:var(--muted); letter-spacing:.12em; text-transform:uppercase; }
+.sc-course{ font-size:.82rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sc-players{ display:flex; flex-direction:column; gap:6px; }
+.sc-row   { display:flex; justify-content:space-between; align-items:center; gap:6px; }
+.sc-name  { font-size:.76rem; display:flex; align-items:center; gap:5px; overflow:hidden; }
+.sc-name span:last-child { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sc-score { font-family:'Space Grotesk',sans-serif; font-size:.9rem; font-weight:700; flex-shrink:0; }
+.sc-win   { font-size:.5rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+            color:#0a0f1a; background:var(--accent); padding:2px 5px; border-radius:3px; flex-shrink:0; }
+.sc-margin{ font-size:.65rem; color:var(--muted-2); margin-top:2px; }
 
-/* ── Gauge panel ─────────────────────────────────────────── */
-.gauge-panel { padding:20px; display:flex; flex-direction:column; gap:8px; align-items:flex-start; }
-.gauge-wrap { width:100%; display:flex; flex-direction:column; align-items:center; gap:6px; margin-top:auto; margin-bottom:8px; }
-.gauge { position:relative; width:160px; height:90px; }
-.gauge-readout { position:absolute; bottom:-4px; left:0; right:0; text-align:center; }
-.gauge-readout .gr-num { font-family:'Space Grotesk',sans-serif; font-size:1.7rem; font-weight:700; }
-.gauge-readout .gr-cap { font-size:0.6rem; color:var(--muted); letter-spacing:0.14em; text-transform:uppercase; }
-
-/* ── Stat-pair panel ─────────────────────────────────────── */
-.statpair { display:grid; grid-template-columns: 1fr 1fr; gap:0; padding:0; }
-.statpair > div { padding:16px 18px; }
-.statpair > div + div { border-left:1px solid var(--line); }
-.sp-label { font-size:0.6rem; color:var(--muted); letter-spacing:0.14em; text-transform:uppercase; font-weight:600; }
-.sp-value { font-family:'Space Grotesk',sans-serif; font-size:1.5rem; font-weight:700; line-height:1.1; margin-top:6px; }
-.sp-sub { font-size:0.68rem; color:var(--muted-2); margin-top:2px; }
+/* ── Last Session Deep-Dive (Option C) ──────────────────── */
+.lsr-wrap  { padding:22px 24px; display:flex; flex-direction:column; gap:14px; position:relative; overflow:hidden; }
+.lsr-eyebrow { font-size:.62rem; color:var(--accent-2); letter-spacing:.16em; text-transform:uppercase; font-weight:600; }
+.lsr-course  { font-size:1rem; font-weight:700; }
+.lsr-date    { font-size:.7rem; color:var(--muted-2); }
+.lsr-winner-row { display:flex; align-items:baseline; gap:10px; }
+.lsr-winner  { font-family:'Space Grotesk',sans-serif; font-size:2rem; font-weight:700; line-height:1; }
+.lsr-margin  { font-size:.72rem; color:var(--muted-2); }
+.lsr-scores  { display:flex; flex-direction:column; gap:7px; }
+.lsr-srow    { display:flex; justify-content:space-between; align-items:center; padding:8px 12px; border-radius:8px; }
+.lsr-splayer { font-size:.82rem; font-weight:600; display:flex; align-items:center; gap:7px; }
+.lsr-right   { display:flex; align-items:center; gap:12px; }
+.lsr-birdie  { font-size:.68rem; color:var(--muted-2); }
+.lsr-gross   { font-family:'Space Grotesk',sans-serif; font-size:1.1rem; font-weight:700; }
+.lsr-net     { font-size:.62rem; color:var(--muted); }
+/* stat comparison table */
+.lst-wrap    { overflow-x:auto; }
+.lst-table   { width:100%; border-collapse:collapse; font-size:.82rem; }
+.lst-table th{ padding:8px 14px; text-align:left; font-size:.6rem; font-weight:600;
+               text-transform:uppercase; letter-spacing:.12em; color:var(--muted);
+               border-bottom:1px solid var(--line); white-space:nowrap; }
+.lst-table td{ padding:8px 14px; border-bottom:1px solid rgba(99,140,210,.06); vertical-align:middle; }
+.lst-table tr:last-child td { border-bottom:none; }
+.lst-stat-label { color:var(--muted); font-size:.68rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase; white-space:nowrap; }
+.lst-bar-wrap{ display:flex; align-items:center; gap:8px; }
+.lst-bar-bg  { height:5px; background:rgba(99,140,210,.1); border-radius:3px; flex:1; min-width:40px; }
+.lst-bar-fill{ height:100%; border-radius:3px; }
 
 /* ── Cockpit grid (chart row + side card) ────────────────── */
 .cockpit {
@@ -823,8 +857,6 @@ footer .fl { display:flex; align-items:center; gap:8px; }
   .sidebar-foot { display:none; }
 }
 @media(max-width:560px){
-  .feature-name { font-size:1.8rem; }
-  .stage-feature { padding:18px; min-height:180px; }
   .panel-pad, .panel-pad-l, .matrix-wrap, .duel-panel, .shot-bar-section { padding:16px; }
 }
 </style>
@@ -866,9 +898,19 @@ footer .fl { display:flex; align-items:center; gap:8px; }
       <div class="kpi-strip" id="kpiStrip"></div>
     </section>
 
-    <!-- Hero stage -->
-    <section aria-label="Featured player and performance">
-      <div class="stage" id="stage"></div>
+    <!-- Recent Sessions Feed (Option A) -->
+    <section aria-labelledby="rs-title">
+      <div class="section-title" id="rs-title">
+        <span class="st-accent">Recent Sessions</span>
+        <span class="panel-sub" style="margin-left:auto;text-transform:none;letter-spacing:0">last 10 qualifying rounds</span>
+      </div>
+      <div class="sessions-feed" id="sessionsFeed"></div>
+    </section>
+
+    <!-- Last Session Deep-Dive (Option C) -->
+    <section aria-labelledby="ls-title">
+      <div class="section-title" id="ls-title"><span class="st-accent">Last Session</span></div>
+      <div class="analytics-grid" id="lastSession"></div>
     </section>
 
     <!-- Leaderboard -->
@@ -970,8 +1012,9 @@ const MIN_ROUNDS  = 5;
 const COLORS      = __COLORS__;
 const PER_PLAYER  = __PERP__;
 const H2H         = __H2H__;
-const TOP_COURSES = __COURSES__;
-const MONTHLY     = __MONTHLY__;
+const TOP_COURSES      = __COURSES__;
+const MONTHLY          = __MONTHLY__;
+const RECENT_SESSIONS  = __RECENT_SESSIONS__;
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let activePlayer = 'all';
@@ -1023,7 +1066,8 @@ function initials(name){
 document.addEventListener('DOMContentLoaded', () => {
   renderPills();
   renderKpiStrip();
-  renderStage();
+  renderSessionsFeed();
+  renderLastSession();
   renderLeaderboard();
   initTrendChart();
   initBaselineChart();
@@ -1102,7 +1146,8 @@ function setPlayer(p) {
   if (crumb) crumb.textContent = p==='all' ? 'All Players' : p;
   renderPills();
   renderKpiStrip();
-  renderStage();
+  renderSessionsFeed();
+  renderLastSession();
   renderLeaderboard();
   updateTrendChart();
   updateBaselineChart();
@@ -1161,135 +1206,143 @@ function renderKpiStrip() {
   ].join('');
 }
 
-// ── Stage (feature panel + gauge + stat-pair) ─────────────────────────────────
-function renderStage() {
-  const el = document.getElementById('stage');
-  const players = rankedPlayers();
-
-  let featured, eyebrow, tag, statBlocks, gaugeVal, gaugeLabel, gaugeColor;
-
+// ── Recent Sessions Feed (Option A) ──────────────────────────────────────────
+function renderSessionsFeed() {
+  const el = document.getElementById('sessionsFeed');
+  let sessions = RECENT_SESSIONS;
   if (activePlayer !== 'all') {
-    const p = activePlayer;
-    const pp = PER_PLAYER[p];
-    featured  = p;
-    eyebrow   = 'Player Spotlight';
-    tag       = `${pp.archetype[1]} · ${pp.glabel}`;
-    statBlocks = [
-      ['Avg 18H',    pp.avg18!=null?fmt1(pp.avg18):'—'],
-      ['Best',       pp.best18??'—'],
-      ['Rounds',     pp.count],
-      ['H2H Win%',   `${pp.win_rate}%`],
-    ];
-    // Gauge: percentile (lower avg = higher percentile of group)
-    const allAvgs = PLAYERS.map(x=>PER_PLAYER[x].avg18).filter(v=>v!=null);
-    if (pp.avg18!=null && allAvgs.length){
-      const better = allAvgs.filter(v=>v>=pp.avg18).length;
-      gaugeVal   = Math.round(better/allAvgs.length*100);
-      gaugeLabel = 'Group Percentile';
-    } else {
-      gaugeVal = 50; gaugeLabel = 'No data';
-    }
-    gaugeColor = COLORS[p] || 'var(--accent)';
-  } else {
-    const sorted18 = players.filter(p=>PER_PLAYER[p].avg18!=null).sort((a,b)=>PER_PLAYER[a].avg18-PER_PLAYER[b].avg18);
-    const leader = sorted18[0];
-    const pp = leader ? PER_PLAYER[leader] : null;
-    featured  = leader || '—';
-    eyebrow   = 'Scoring Leader';
-    tag       = pp ? `${pp.archetype[1]} · grade ${pp.grade}` : '';
-    statBlocks = pp ? [
-      ['Avg 18H',    fmt1(pp.avg18)],
-      ['Best',       pp.best18],
-      ['Rounds',     pp.count],
-      ['Form',       pp.form_label||'—'],
-    ] : [];
-    // Gauge: form_diff scaled
-    if (pp && pp.form_diff!=null) {
-      gaugeVal = Math.max(0, Math.min(100, Math.round(50 + pp.form_diff*8)));
-      gaugeLabel = pp.form_label || 'Current Form';
-    } else {
-      gaugeVal = 60; gaugeLabel = 'Form trend';
-    }
-    gaugeColor = leader ? (COLORS[leader]||'var(--accent)') : 'var(--accent)';
+    sessions = sessions.filter(s => s.players.some(p => p.player === activePlayer));
   }
-
-  const featCol = COLORS[featured] || 'var(--accent)';
-  const featStatsHtml = statBlocks.map(([l,v])=>`<div class="feature-stat"><div class="fs-label">${l}</div><div class="fs-value">${v}</div></div>`).join('');
-
-  // hottest form & most consistent for side stat-pair (always shown)
-  const eligible = eligiblePlayers();
-  const hottest = eligible.filter(p=>PER_PLAYER[p].form_diff!=null).sort((a,b)=>PER_PLAYER[b].form_diff-PER_PLAYER[a].form_diff)[0];
-  const mostConsistent = eligible.filter(p=>PER_PLAYER[p].std18!=null).sort((a,b)=>PER_PLAYER[a].std18-PER_PLAYER[b].std18)[0];
-  const mostActive = [...eligible].sort((a,b)=>PER_PLAYER[b].count-PER_PLAYER[a].count)[0];
-
-  el.innerHTML = `
-    <div class="panel stage-feature glow">
-      <div class="feature-eyebrow">${eyebrow}</div>
-      <div class="feature-name" style="color:${featCol}">${featured}</div>
-      <div class="feature-tag">${tag}</div>
-      <div class="feature-stats">${featStatsHtml}</div>
-      ${activePlayer==='all' && featured!=='—' ? `<button class="feature-cta" type="button" onclick="setPlayer('${featured}')">View profile</button>` : ''}
-    </div>
-    <div class="panel gauge-panel">
-      <div class="panel-head" style="padding:0">
-        <h3>Performance</h3>
+  if (!sessions.length) {
+    el.innerHTML = '<div style="color:var(--muted);font-size:.82rem;padding:16px 0">No sessions found.</div>';
+    return;
+  }
+  el.innerHTML = sessions.map(s => {
+    const winner = s.players[0];
+    const winCol = COLORS[winner.player] || 'var(--accent)';
+    const d = s.date ? new Date(s.date + 'T12:00:00') : null;
+    const dateStr = d ? d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'2-digit'}) : '—';
+    const margin = s.players.length >= 2 && s.players[0].score != null && s.players[1].score != null
+      ? s.players[1].score - s.players[0].score : null;
+    const rows = s.players.map((p, i) => {
+      const col = COLORS[p.player] || 'var(--accent)';
+      return `<div class="sc-row">
+        <div class="sc-name">
+          <span class="player-dot" style="background:${col};color:${col}"></span>
+          <span>${p.player}</span>
+          ${i === 0 ? '<span class="sc-win">W</span>' : ''}
+        </div>
+        <div class="sc-score" style="color:${col}">${p.score ?? '—'}</div>
+      </div>`;
+    }).join('');
+    return `<div class="panel session-card" style="border-top-color:${winCol}">
+      <div>
+        <div class="sc-date">${dateStr}</div>
+        <div class="sc-course" title="${s.course}">${s.course}</div>
       </div>
-      ${gaugeSvg(gaugeVal, gaugeColor, gaugeLabel)}
-    </div>
-    <div class="panel">
-      <div class="panel-head"><h3>Group Pulse</h3></div>
-      <div class="statpair">
-        <div>
-          <div class="sp-label">Hottest Form</div>
-          <div class="sp-value">${hottest?hottest:'—'}</div>
-          <div class="sp-sub">${hottest?(PER_PLAYER[hottest].form_label||'')+(PER_PLAYER[hottest].form_diff!=null?` · ${PER_PLAYER[hottest].form_diff>0?'+':''}${fmt1(PER_PLAYER[hottest].form_diff)}`:''):''}</div>
-        </div>
-        <div>
-          <div class="sp-label">Most Consistent</div>
-          <div class="sp-value">${mostConsistent?mostConsistent:'—'}</div>
-          <div class="sp-sub">${mostConsistent?`σ ${PER_PLAYER[mostConsistent].std18} · grade ${PER_PLAYER[mostConsistent].grade}`:''}</div>
-        </div>
-        <div>
-          <div class="sp-label">Most Active</div>
-          <div class="sp-value">${mostActive?mostActive:'—'}</div>
-          <div class="sp-sub">${mostActive?`${PER_PLAYER[mostActive].count} rounds`:''}</div>
-        </div>
-        <div>
-          <div class="sp-label">Eligible</div>
-          <div class="sp-value">${eligible.length}/${PLAYERS.length}</div>
-          <div class="sp-sub">${MIN_ROUNDS}+ rounds</div>
+      <div class="sc-players">${rows}</div>
+      ${margin !== null ? `<div class="sc-margin">Won by ${margin} stroke${margin !== 1 ? 's' : ''}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ── Last Session Deep-Dive (Option C) ────────────────────────────────────────
+function renderLastSession() {
+  const el = document.getElementById('lastSession');
+  let sessions = RECENT_SESSIONS;
+  if (activePlayer !== 'all') {
+    sessions = sessions.filter(s => s.players.some(p => p.player === activePlayer));
+  }
+  if (!sessions.length) {
+    el.innerHTML = '<div style="color:var(--muted);font-size:.82rem;padding:16px 0">No session data.</div>';
+    return;
+  }
+  const s = sessions[0];
+  const winner = s.players[0];
+  const winCol = COLORS[winner.player] || 'var(--accent)';
+  const d = s.date ? new Date(s.date + 'T12:00:00') : null;
+  const dateStr = d ? d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}) : '—';
+  const margin = s.players.length >= 2 && s.players[0].score != null && s.players[1].score != null
+    ? s.players[1].score - s.players[0].score : null;
+
+  const scoreRows = s.players.map((p, i) => {
+    const col = COLORS[p.player] || 'var(--accent)';
+    const bg = i === 0 ? `background:${winCol}12` : 'background:rgba(255,255,255,.02)';
+    const bTag = p.birdies ? `<span class="lsr-birdie">${p.birdies} birdie${p.birdies !== 1 ? 's' : ''}</span>` : '';
+    return `<div class="lsr-srow" style="${bg}">
+      <div class="lsr-splayer">
+        <span class="player-dot" style="background:${col};color:${col}"></span>
+        <span style="color:${col}">${p.player}</span>
+        ${i === 0 ? `<span style="font-size:.55rem;color:${col};opacity:.7;letter-spacing:.12em;text-transform:uppercase;font-weight:700">WINNER</span>` : ''}
+      </div>
+      <div class="lsr-right">
+        ${bTag}
+        <div style="text-align:right">
+          <div class="lsr-gross" style="color:${col}">${p.score ?? '—'}</div>
+          ${p.net != null ? `<div class="lsr-net">net ${p.net}</div>` : ''}
         </div>
       </div>
     </div>`;
-}
+  }).join('');
 
-function gaugeSvg(value, color, label) {
-  const v = Math.max(0, Math.min(100, value));
-  const r = 70, cx = 80, cy = 80;
-  const start = Math.PI, end = 2*Math.PI;
-  const ang = start + (end-start) * (v/100);
-  const sx = cx + r*Math.cos(start), sy = cy + r*Math.sin(start);
-  const ex = cx + r*Math.cos(ang),   ey = cy + r*Math.sin(ang);
-  const ex2 = cx + r*Math.cos(end),  ey2 = cy + r*Math.sin(end);
-  const large = (ang-start) > Math.PI ? 1 : 0;
-  return `<div class="gauge-wrap">
-    <div class="gauge">
-      <svg viewBox="0 0 160 90" width="160" height="90" aria-label="Gauge">
-        <defs>
-          <linearGradient id="gg" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stop-color="${color}" stop-opacity="0.6"/>
-            <stop offset="100%" stop-color="${color}"/>
-          </linearGradient>
-        </defs>
-        <path d="M ${sx} ${sy} A ${r} ${r} 0 1 1 ${ex2} ${ey2}" fill="none" stroke="rgba(99,140,210,0.18)" stroke-width="10" stroke-linecap="round"/>
-        <path d="M ${sx} ${sy} A ${r} ${r} 0 ${large} 1 ${ex} ${ey}" fill="none" stroke="url(#gg)" stroke-width="10" stroke-linecap="round" style="filter:drop-shadow(0 0 6px ${color})"/>
-      </svg>
-      <div class="gauge-readout">
-        <div class="gr-num" style="color:${color}">${v}<span style="font-size:0.9rem;color:var(--muted)">%</span></div>
-        <div class="gr-cap">${label}</div>
+  // Stat comparison table — max per column drives bar width
+  const stats = [
+    ['GIR %',    p => p.gir_pct,               v => v + '%',       true ],
+    ['FIR %',    p => p.fir_pct,               v => v + '%',       true ],
+    ['Birdies',  p => p.birdies ?? 0,           v => v,             true ],
+    ['Bogeys',   p => p.bogeys ?? 0,            v => v,             false],
+    ['Doubles+', p => (p.doubles??0)+(p.others??0), v => v,        false],
+    ['Driving',  p => p.driving,                v => v + ' yd',    true ],
+  ];
+
+  const headerCells = s.players.map(p => {
+    const col = COLORS[p.player] || 'var(--accent)';
+    return `<th style="color:${col}">${p.player}</th>`;
+  }).join('');
+
+  const tableRows = stats.map(([label, getter, fmtr, higherBetter]) => {
+    const vals = s.players.map(getter);
+    const defined = vals.filter(v => v != null);
+    if (!defined.length) return '';
+    const maxVal = Math.max(...defined) || 1;
+    const best = higherBetter ? Math.max(...defined) : Math.min(...defined);
+    const cells = s.players.map((p, i) => {
+      const v = getter(p);
+      const col = COLORS[p.player] || 'var(--accent)';
+      const pct = v != null ? Math.round(v / maxVal * 100) : 0;
+      const isBest = v != null && v === best;
+      return `<td>
+        <div class="lst-bar-wrap">
+          <span style="min-width:46px;font-weight:${isBest?700:400};color:${isBest?col:'var(--text-dim)'}">${v != null ? fmtr(v) : '—'}</span>
+          <div class="lst-bar-bg"><div class="lst-bar-fill" style="width:${pct}%;background:${col}"></div></div>
+        </div>
+      </td>`;
+    }).join('');
+    return `<tr><td class="lst-stat-label">${label}</td>${cells}</tr>`;
+  }).filter(Boolean).join('');
+
+  el.innerHTML = `
+    <div class="panel lsr-wrap" style="background:radial-gradient(ellipse 80% 120% at 90% 10%,${winCol}18 0%,transparent 55%),var(--panel)">
+      <div>
+        <div class="lsr-eyebrow">Last Session</div>
+        <div class="lsr-course">${s.course}</div>
+        <div class="lsr-date">${dateStr}</div>
       </div>
+      <div class="lsr-winner-row">
+        <div class="lsr-winner" style="color:${winCol}">${winner.player}</div>
+        ${margin !== null ? `<div class="lsr-margin">won by ${margin} stroke${margin !== 1 ? 's' : ''}</div>` : ''}
+      </div>
+      <div class="lsr-scores">${scoreRows}</div>
     </div>
-  </div>`;
+    <div class="panel" style="padding:0">
+      <div class="panel-head" style="padding:16px 18px 0"><h3>Shot Stats Comparison</h3></div>
+      <div class="lst-wrap" style="padding:8px 0 16px">
+        <table class="lst-table">
+          <thead><tr><th></th>${headerCells}</tr></thead>
+          <tbody>${tableRows}</tbody>
+        </table>
+      </div>
+    </div>`;
 }
 
 function courseRank(p) {
@@ -2054,7 +2107,8 @@ TEMPLATE = TEMPLATE.replace('__COLORS__',      COLORS_J)
 TEMPLATE = TEMPLATE.replace('__PERP__',        PERP_J)
 TEMPLATE = TEMPLATE.replace('__H2H__',         H2H_J)
 TEMPLATE = TEMPLATE.replace('__COURSES__',     COURSES_J)
-TEMPLATE = TEMPLATE.replace('__MONTHLY__',     MONTHLY_J)
+TEMPLATE = TEMPLATE.replace('__MONTHLY__',          MONTHLY_J)
+TEMPLATE = TEMPLATE.replace('__RECENT_SESSIONS__',  RECENT_SESSIONS_J)
 TEMPLATE = TEMPLATE.replace('__GENERATED__',     GENERATED)
 TEMPLATE = TEMPLATE.replace('__GENERATED_ISO__', GENERATED_ISO)
 TEMPLATE = TEMPLATE.replace('__ROUND_COUNT__',   str(len(rounds)))
