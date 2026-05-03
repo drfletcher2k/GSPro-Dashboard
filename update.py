@@ -1,10 +1,11 @@
-import json, os, importlib
+import json, os, importlib, datetime
 from collections import defaultdict
 import fetch, filter as flt, transform
 
-DIR    = os.path.dirname(os.path.abspath(__file__))
-LATEST = os.path.join(DIR, "data", "latest.json")
-TRANSFORMED = os.path.join(DIR, "data", "transformed.json")
+DIR          = os.path.dirname(os.path.abspath(__file__))
+LATEST       = os.path.join(DIR, "data", "latest.json")
+LAST_UPDATED = os.path.join(DIR, "data", "last_updated.json")
+TRANSFORMED  = os.path.join(DIR, "data", "transformed.json")
 
 def run():
     fetch.run()
@@ -47,6 +48,12 @@ def run():
     import gen_dashboard
     importlib.reload(gen_dashboard)
     print("index.html regenerated")
+
+    # Write a tiny sentinel file so the browser can detect when new data arrives
+    stamp = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+    with open(LAST_UPDATED, "w") as f:
+        json.dump({"updated_at": stamp, "round_count": len(multi)}, f)
+    print(f"data/last_updated.json → {stamp}")
 
 if __name__ == "__main__":
     run()
