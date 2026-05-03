@@ -265,66 +265,59 @@ main { display:flex; flex-direction:column; gap:18px; min-width:0; }
 .kpi-value { font-family:'Space Grotesk', sans-serif; font-size:1.45rem; font-weight:700; line-height:1.1; letter-spacing:-0.01em; }
 .kpi-sub   { font-size:0.7rem; color:var(--muted-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
-/* ── Hero (stage) row ────────────────────────────────────── */
-.stage {
-  display:grid;
-  grid-template-columns: 1.7fr 1fr 1fr;
-  gap:14px;
+/* ── Recent Sessions Feed (Option A) ────────────────────── */
+.sessions-feed {
+  display:flex; gap:12px; overflow-x:auto; padding-bottom:6px;
+  scrollbar-width:thin; scrollbar-color:rgba(99,140,210,.25) transparent;
 }
-@media(max-width:1280px){ .stage { grid-template-columns: 1fr 1fr; } .stage .stage-feature { grid-column: 1/-1; } }
-@media(max-width:760px){  .stage { grid-template-columns: 1fr; } }
-.stage-feature {
-  padding:24px 26px;
-  position:relative;
-  background:
-    radial-gradient(ellipse 60% 100% at 100% 50%, rgba(79,139,255,0.18) 0%, transparent 60%),
-    linear-gradient(180deg, rgba(15,23,42,0.95), rgba(10,16,32,0.95));
-  display:flex; flex-direction:column; gap:14px;
-  min-height:240px;
+.sessions-feed::-webkit-scrollbar { height:4px; }
+.sessions-feed::-webkit-scrollbar-thumb { background:rgba(99,140,210,.25); border-radius:2px; }
+.session-card {
+  flex:0 0 210px; min-width:0;
+  border-radius:12px; padding:14px 16px;
+  display:flex; flex-direction:column; gap:10px;
+  border-top-width:3px; border-top-style:solid;
+  transition:transform .15s, box-shadow .15s;
 }
-.stage-feature::before {
-  content:''; position:absolute; right:-40px; top:-40px;
-  width:240px; height:240px; border-radius:50%;
-  background: radial-gradient(circle, rgba(79,139,255,0.45), transparent 70%);
-  filter: blur(28px); pointer-events:none;
-}
-.feature-eyebrow {
-  font-size:0.65rem; color:var(--accent-2); letter-spacing:0.18em; text-transform:uppercase; font-weight:600;
-}
-.feature-name {
-  font-family:'Space Grotesk','Inter',sans-serif;
-  font-size:2.4rem; font-weight:700; letter-spacing:-0.02em; line-height:1.05;
-}
-.feature-tag { font-size:0.78rem; color:var(--text-dim); max-width:300px; }
-.feature-stats { display:flex; gap:24px; margin-top:auto; flex-wrap:wrap; }
-.feature-stat .fs-label { font-size:0.62rem; color:var(--muted); letter-spacing:0.14em; text-transform:uppercase; }
-.feature-stat .fs-value { font-family:'Space Grotesk',sans-serif; font-size:1.2rem; font-weight:700; }
-.feature-cta {
-  align-self:flex-start;
-  padding:9px 16px; border-radius:10px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  color:#fff; font-size:0.78rem; font-weight:600; letter-spacing:0.04em;
-  border:none; cursor:pointer;
-  box-shadow: 0 0 24px -6px var(--accent-glow);
-  transition: transform .15s, box-shadow .15s;
-}
-.feature-cta:hover { transform:translateY(-1px); box-shadow:0 0 28px -4px var(--accent-glow); }
+.session-card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.35); }
+.sc-date  { font-size:0.6rem; color:var(--muted); letter-spacing:.12em; text-transform:uppercase; }
+.sc-course{ font-size:.82rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sc-players{ display:flex; flex-direction:column; gap:6px; }
+.sc-row   { display:flex; justify-content:space-between; align-items:center; gap:6px; }
+.sc-name  { font-size:.76rem; display:flex; align-items:center; gap:5px; overflow:hidden; }
+.sc-name span:last-child { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sc-score { font-family:'Space Grotesk',sans-serif; font-size:.9rem; font-weight:700; flex-shrink:0; }
+.sc-win   { font-size:.5rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+            color:#0a0f1a; background:var(--accent); padding:2px 5px; border-radius:3px; flex-shrink:0; }
+.sc-margin{ font-size:.65rem; color:var(--muted-2); margin-top:2px; }
 
-/* ── Gauge panel ─────────────────────────────────────────── */
-.gauge-panel { padding:20px; display:flex; flex-direction:column; gap:8px; align-items:flex-start; }
-.gauge-wrap { width:100%; display:flex; flex-direction:column; align-items:center; gap:6px; margin-top:auto; margin-bottom:8px; }
-.gauge { position:relative; width:160px; height:90px; }
-.gauge-readout { position:absolute; bottom:-4px; left:0; right:0; text-align:center; }
-.gauge-readout .gr-num { font-family:'Space Grotesk',sans-serif; font-size:1.7rem; font-weight:700; }
-.gauge-readout .gr-cap { font-size:0.6rem; color:var(--muted); letter-spacing:0.14em; text-transform:uppercase; }
-
-/* ── Stat-pair panel ─────────────────────────────────────── */
-.statpair { display:grid; grid-template-columns: 1fr 1fr; gap:0; padding:0; }
-.statpair > div { padding:16px 18px; }
-.statpair > div + div { border-left:1px solid var(--line); }
-.sp-label { font-size:0.6rem; color:var(--muted); letter-spacing:0.14em; text-transform:uppercase; font-weight:600; }
-.sp-value { font-family:'Space Grotesk',sans-serif; font-size:1.5rem; font-weight:700; line-height:1.1; margin-top:6px; }
-.sp-sub { font-size:0.68rem; color:var(--muted-2); margin-top:2px; }
+/* ── Last Session Deep-Dive (Option C) ──────────────────── */
+.lsr-wrap  { padding:22px 24px; display:flex; flex-direction:column; gap:14px; position:relative; overflow:hidden; }
+.lsr-eyebrow { font-size:.62rem; color:var(--accent-2); letter-spacing:.16em; text-transform:uppercase; font-weight:600; }
+.lsr-course  { font-size:1rem; font-weight:700; }
+.lsr-date    { font-size:.7rem; color:var(--muted-2); }
+.lsr-winner-row { display:flex; align-items:baseline; gap:10px; }
+.lsr-winner  { font-family:'Space Grotesk',sans-serif; font-size:2rem; font-weight:700; line-height:1; }
+.lsr-margin  { font-size:.72rem; color:var(--muted-2); }
+.lsr-scores  { display:flex; flex-direction:column; gap:7px; }
+.lsr-srow    { display:flex; justify-content:space-between; align-items:center; padding:8px 12px; border-radius:8px; }
+.lsr-splayer { font-size:.82rem; font-weight:600; display:flex; align-items:center; gap:7px; }
+.lsr-right   { display:flex; align-items:center; gap:12px; }
+.lsr-birdie  { font-size:.68rem; color:var(--muted-2); }
+.lsr-gross   { font-family:'Space Grotesk',sans-serif; font-size:1.1rem; font-weight:700; }
+.lsr-net     { font-size:.62rem; color:var(--muted); }
+/* stat comparison table */
+.lst-wrap    { overflow-x:auto; }
+.lst-table   { width:100%; border-collapse:collapse; font-size:.82rem; }
+.lst-table th{ padding:8px 14px; text-align:left; font-size:.6rem; font-weight:600;
+               text-transform:uppercase; letter-spacing:.12em; color:var(--muted);
+               border-bottom:1px solid var(--line); white-space:nowrap; }
+.lst-table td{ padding:8px 14px; border-bottom:1px solid rgba(99,140,210,.06); vertical-align:middle; }
+.lst-table tr:last-child td { border-bottom:none; }
+.lst-stat-label { color:var(--muted); font-size:.68rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase; white-space:nowrap; }
+.lst-bar-wrap{ display:flex; align-items:center; gap:8px; }
+.lst-bar-bg  { height:5px; background:rgba(99,140,210,.1); border-radius:3px; flex:1; min-width:40px; }
+.lst-bar-fill{ height:100%; border-radius:3px; }
 
 /* ── Cockpit grid (chart row + side card) ────────────────── */
 .cockpit {
@@ -523,8 +516,6 @@ footer .fl { display:flex; align-items:center; gap:8px; }
   .sidebar-foot { display:none; }
 }
 @media(max-width:560px){
-  .feature-name { font-size:1.8rem; }
-  .stage-feature { padding:18px; min-height:180px; }
   .panel-pad, .panel-pad-l, .matrix-wrap, .duel-panel, .shot-bar-section { padding:16px; }
 }
 </style>
@@ -558,7 +549,7 @@ footer .fl { display:flex; align-items:center; gap:8px; }
     <div class="topbar">
       <div class="crumbs">Dashboard · <strong id="crumbCtx">All Players</strong></div>
       <div class="topbar-spacer"></div>
-      <div class="topbar-tag"><span class="live-dot" aria-hidden="true"></span><span>Synced 2026-05-03 17:36</span></div>
+      <div class="topbar-tag"><span class="live-dot" aria-hidden="true"></span><span>Synced 2026-05-03 22:34</span></div>
     </div>
 
     <!-- KPI strip -->
@@ -566,9 +557,19 @@ footer .fl { display:flex; align-items:center; gap:8px; }
       <div class="kpi-strip" id="kpiStrip"></div>
     </section>
 
-    <!-- Hero stage -->
-    <section aria-label="Featured player and performance">
-      <div class="stage" id="stage"></div>
+    <!-- Recent Sessions Feed (Option A) -->
+    <section aria-labelledby="rs-title">
+      <div class="section-title" id="rs-title">
+        <span class="st-accent">Recent Sessions</span>
+        <span class="panel-sub" style="margin-left:auto;text-transform:none;letter-spacing:0">last 10 qualifying rounds</span>
+      </div>
+      <div class="sessions-feed" id="sessionsFeed"></div>
+    </section>
+
+    <!-- Last Session Deep-Dive (Option C) -->
+    <section aria-labelledby="ls-title">
+      <div class="section-title" id="ls-title"><span class="st-accent">Last Session</span></div>
+      <div class="analytics-grid" id="lastSession"></div>
     </section>
 
     <!-- Leaderboard -->
@@ -656,7 +657,7 @@ footer .fl { display:flex; align-items:center; gap:8px; }
 
     <footer>
       <div class="fl"><span class="live-dot" aria-hidden="true"></span><span>GSPro Analytics</span></div>
-      <div>Generated 2026-05-03 17:36 · 234 rounds · 7 players</div>
+      <div>Generated 2026-05-03 22:34 · 234 rounds · 7 players</div>
     </footer>
 
   </main>
@@ -670,8 +671,9 @@ const MIN_ROUNDS  = 5;
 const COLORS      = {"Dan":"#60a5fa","Tobby":"#f87171","Brad":"#fbbf24","Jack":"#a78bfa","Baumbach":"#22d3ee","Dapp":"#f472b6","Mad":"#34d399","Maddox":"#34d399","Dan/Thom":"#fb923c","Albert":"#fb923c"};
 const PER_PLAYER  = {"Baumbach":{"count":5,"count18":5,"avg18":86.6,"best18":81,"worst18":94,"std18":5.46,"grade":"B","glabel":"Steady","form_diff":0.0,"form_label":"Steady","peak":{"avg":86.6,"end":"2026-04-12"},"trend18":[{"d":"2025-07-26","s":94,"a":94.0},{"d":"2025-08-01","s":90,"a":92.0},{"d":"2026-03-26","s":81,"a":88.3},{"d":"2026-04-12","s":86,"a":87.8},{"d":"2026-04-12","s":82,"a":86.6}],"monthly_avg":{"2025-07":94.0,"2025-08":90.0,"2026-03":81.0,"2026-04":84.0},"solo_avg18":null,"group_avg18":86.6,"solo_count18":0,"group_count18":5,"velocity":null,"baseline_vs":[{"d":"2025-07-26","score":94,"baseline":null,"vs":null},{"d":"2025-08-01","score":90,"baseline":94.0,"vs":-4.0},{"d":"2026-03-26","score":81,"baseline":92.0,"vs":-11.0},{"d":"2026-04-12","score":86,"baseline":88.3,"vs":-2.3},{"d":"2026-04-12","score":82,"baseline":87.8,"vs":-5.8}],"last_vs_baseline":-5.8,"std5":5.46,"std10":5.46,"blowup_avg18":3.8,"blowup_recent18":3.8,"birdies_recent18":1.0,"birdies_prior18":null,"sim_index":null,"avg_fir18":4.2,"avg_gir18":4.8,"archetype":["IRON","Iron Player"],"unique_courses":5,"score_dist":{"<80":0,"80-84":2,"85-89":1,"90-94":2,"95-99":0,"100+":0},"color":"#22d3ee","avg_eagles18":0.0,"avg_birdies18":1.0,"avg_pars18":6.8,"avg_bogeys18":6.4,"avg_dbl18":2.6,"avg_drive18":240.6,"avg_net18":81.8,"nemesis":{"p":"Tobby","w":1,"l":3,"t":0,"tot":4},"prey":{"p":"Jack","w":3,"l":0,"t":0,"tot":3},"win_rate":58.3,"total_games":12},"Brad":{"count":22,"count18":22,"avg18":86.3,"best18":75,"worst18":104,"std18":7.21,"grade":"C","glabel":"Variable","form_diff":4.1,"form_label":"Scorching","peak":{"avg":80.6,"end":"2025-08-15"},"trend18":[{"d":"2025-02-10","s":99,"a":99.0},{"d":"2025-02-23","s":85,"a":92.0},{"d":"2025-03-29","s":95,"a":93.0},{"d":"2025-04-28","s":83,"a":90.5},{"d":"2025-04-29","s":81,"a":88.6},{"d":"2025-05-25","s":79,"a":84.6},{"d":"2025-07-05","s":75,"a":82.6},{"d":"2025-08-15","s":85,"a":80.6},{"d":"2025-08-31","s":88,"a":81.6},{"d":"2025-08-31","s":104,"a":86.2},{"d":"2025-09-19","s":90,"a":88.4},{"d":"2026-01-07","s":89,"a":91.2},{"d":"2026-02-21","s":82,"a":90.6},{"d":"2026-02-28","s":99,"a":92.8},{"d":"2026-03-21","s":84,"a":88.8},{"d":"2026-03-28","s":87,"a":88.2},{"d":"2026-03-28","s":83,"a":87.0},{"d":"2026-04-04","s":83,"a":87.2},{"d":"2026-04-09","s":82,"a":83.8},{"d":"2026-04-10","s":84,"a":83.8},{"d":"2026-04-11","s":83,"a":83.0},{"d":"2026-04-18","s":79,"a":82.2}],"monthly_avg":{"2025-02":92.0,"2025-03":95.0,"2025-04":82.0,"2025-05":79.0,"2025-07":75.0,"2025-08":92.3,"2025-09":90.0,"2026-01":89.0,"2026-02":90.5,"2026-03":84.7,"2026-04":82.2},"solo_avg18":null,"group_avg18":86.3,"solo_count18":0,"group_count18":22,"velocity":-0.178,"baseline_vs":[{"d":"2025-02-10","score":99,"baseline":null,"vs":null},{"d":"2025-02-23","score":85,"baseline":99.0,"vs":-14.0},{"d":"2025-03-29","score":95,"baseline":92.0,"vs":3.0},{"d":"2025-04-28","score":83,"baseline":93.0,"vs":-10.0},{"d":"2025-04-29","score":81,"baseline":90.5,"vs":-9.5},{"d":"2025-05-25","score":79,"baseline":88.6,"vs":-9.6},{"d":"2025-07-05","score":75,"baseline":87.0,"vs":-12.0},{"d":"2025-08-15","score":85,"baseline":85.3,"vs":-0.3},{"d":"2025-08-31","score":88,"baseline":85.2,"vs":2.8},{"d":"2025-08-31","score":104,"baseline":85.6,"vs":18.4},{"d":"2025-09-19","score":90,"baseline":87.4,"vs":2.6},{"d":"2026-01-07","score":89,"baseline":86.5,"vs":2.5},{"d":"2026-02-21","score":82,"baseline":86.9,"vs":-4.9},{"d":"2026-02-28","score":99,"baseline":85.6,"vs":13.4},{"d":"2026-03-21","score":84,"baseline":87.2,"vs":-3.2},{"d":"2026-03-28","score":87,"baseline":87.5,"vs":-0.5},{"d":"2026-03-28","score":83,"baseline":88.3,"vs":-5.3},{"d":"2026-04-04","score":83,"baseline":89.1,"vs":-6.1},{"d":"2026-04-09","score":82,"baseline":88.9,"vs":-6.9},{"d":"2026-04-10","score":84,"baseline":88.3,"vs":-4.3},{"d":"2026-04-11","score":83,"baseline":86.3,"vs":-3.3},{"d":"2026-04-18","score":79,"baseline":85.6,"vs":-6.6}],"last_vs_baseline":-6.6,"std5":1.92,"std10":5.44,"blowup_avg18":3.64,"blowup_recent18":2.4,"birdies_recent18":1.2,"birdies_prior18":1.06,"sim_index":8.9,"avg_fir18":4.0,"avg_gir18":4.6,"archetype":["IRON","Iron Player"],"unique_courses":20,"score_dist":{"<80":3,"80-84":9,"85-89":5,"90-94":1,"95-99":3,"100+":1},"color":"#fbbf24","avg_eagles18":0.0,"avg_birdies18":1.09,"avg_pars18":6.55,"avg_bogeys18":6.68,"avg_dbl18":2.27,"avg_drive18":230.1,"avg_net18":76.7,"nemesis":{"p":"Dan","w":15,"l":7,"t":0,"tot":22},"prey":{"p":"Dapp","w":3,"l":0,"t":0,"tot":3},"win_rate":71.8,"total_games":39},"Dan":{"count":100,"count18":100,"avg18":89.8,"best18":75,"worst18":115,"std18":7.61,"grade":"C","glabel":"Variable","form_diff":1.8,"form_label":"Warming Up","peak":{"avg":82.0,"end":"2026-02-21"},"trend18":[{"d":"2025-02-10","s":103,"a":103.0},{"d":"2025-02-23","s":98,"a":100.5},{"d":"2025-03-29","s":107,"a":102.7},{"d":"2025-04-17","s":97,"a":101.2},{"d":"2025-04-28","s":115,"a":104.0},{"d":"2025-04-29","s":88,"a":101.0},{"d":"2025-05-01","s":107,"a":102.8},{"d":"2025-05-23","s":88,"a":99.0},{"d":"2025-05-23","s":97,"a":99.0},{"d":"2025-05-25","s":99,"a":95.8},{"d":"2025-05-25","s":94,"a":97.0},{"d":"2025-05-25","s":96,"a":94.8},{"d":"2025-05-29","s":99,"a":97.0},{"d":"2025-05-29","s":92,"a":96.0},{"d":"2025-06-05","s":86,"a":93.4},{"d":"2025-06-05","s":91,"a":92.8},{"d":"2025-06-06","s":94,"a":92.4},{"d":"2025-06-12","s":89,"a":90.4},{"d":"2025-06-12","s":87,"a":89.4},{"d":"2025-06-12","s":94,"a":91.0},{"d":"2025-06-14","s":91,"a":91.0},{"d":"2025-06-14","s":85,"a":89.2},{"d":"2025-06-14","s":89,"a":89.2},{"d":"2025-06-27","s":82,"a":88.2},{"d":"2025-06-27","s":85,"a":86.4},{"d":"2025-06-27","s":84,"a":85.0},{"d":"2025-07-05","s":79,"a":83.8},{"d":"2025-07-11","s":95,"a":85.0},{"d":"2025-07-19","s":90,"a":86.6},{"d":"2025-07-19","s":83,"a":86.2},{"d":"2025-07-23","s":86,"a":86.6},{"d":"2025-07-23","s":95,"a":89.8},{"d":"2025-07-26","s":87,"a":88.2},{"d":"2025-08-01","s":90,"a":88.2},{"d":"2025-08-01","s":98,"a":91.2},{"d":"2025-08-01","s":112,"a":96.4},{"d":"2025-08-08","s":91,"a":95.6},{"d":"2025-08-08","s":97,"a":97.6},{"d":"2025-08-08","s":100,"a":99.6},{"d":"2025-08-08","s":91,"a":98.2},{"d":"2025-08-15","s":75,"a":90.8},{"d":"2025-08-15","s":82,"a":89.0},{"d":"2025-08-15","s":98,"a":89.2},{"d":"2025-08-18","s":84,"a":86.0},{"d":"2025-08-21","s":85,"a":84.8},{"d":"2025-08-21","s":76,"a":85.0},{"d":"2025-08-22","s":90,"a":86.6},{"d":"2025-08-22","s":83,"a":83.6},{"d":"2025-08-22","s":84,"a":83.6},{"d":"2025-08-22","s":82,"a":83.0},{"d":"2025-08-23","s":87,"a":85.2},{"d":"2025-08-28","s":88,"a":84.8},{"d":"2025-08-29","s":83,"a":84.8},{"d":"2025-08-31","s":83,"a":84.6},{"d":"2025-08-31","s":97,"a":87.6},{"d":"2025-09-08","s":81,"a":86.4},{"d":"2025-09-17","s":85,"a":85.8},{"d":"2025-09-19","s":85,"a":86.2},{"d":"2025-09-19","s":80,"a":85.6},{"d":"2025-09-19","s":86,"a":83.4},{"d":"2025-09-26","s":94,"a":86.0},{"d":"2025-10-02","s":84,"a":85.8},{"d":"2025-10-05","s":97,"a":88.2},{"d":"2025-11-26","s":91,"a":90.4},{"d":"2025-11-26","s":80,"a":89.2},{"d":"2025-11-26","s":87,"a":87.8},{"d":"2025-12-23","s":97,"a":90.4},{"d":"2025-12-23","s":86,"a":88.2},{"d":"2025-12-23","s":79,"a":85.8},{"d":"2026-01-07","s":84,"a":86.6},{"d":"2026-02-21","s":86,"a":86.4},{"d":"2026-02-21","s":75,"a":82.0},{"d":"2026-02-28","s":97,"a":84.2},{"d":"2026-03-19","s":84,"a":85.2},{"d":"2026-03-19","s":88,"a":86.0},{"d":"2026-03-19","s":91,"a":87.0},{"d":"2026-03-19","s":89,"a":89.8},{"d":"2026-03-20","s":90,"a":88.4},{"d":"2026-03-21","s":96,"a":90.8},{"d":"2026-03-26","s":94,"a":92.0},{"d":"2026-03-26","s":76,"a":89.0},{"d":"2026-03-28","s":91,"a":89.4},{"d":"2026-03-28","s":84,"a":88.2},{"d":"2026-04-02","s":86,"a":86.2},{"d":"2026-04-02","s":84,"a":84.2},{"d":"2026-04-04","s":88,"a":86.6},{"d":"2026-04-04","s":90,"a":86.4},{"d":"2026-04-09","s":85,"a":86.6},{"d":"2026-04-10","s":91,"a":87.6},{"d":"2026-04-11","s":90,"a":88.8},{"d":"2026-04-12","s":98,"a":90.8},{"d":"2026-04-12","s":83,"a":89.4},{"d":"2026-04-17","s":102,"a":92.8},{"d":"2026-04-17","s":99,"a":94.4},{"d":"2026-04-17","s":97,"a":95.8},{"d":"2026-04-18","s":88,"a":93.8},{"d":"2026-04-30","s":96,"a":96.4},{"d":"2026-04-30","s":86,"a":93.2},{"d":"2026-04-30","s":81,"a":89.6},{"d":"2026-05-02","s":89,"a":88.0}],"monthly_avg":{"2025-02":100.5,"2025-03":107.0,"2025-04":100.0,"2025-05":96.5,"2025-06":88.1,"2025-07":87.9,"2025-08":88.9,"2025-09":85.2,"2025-10":90.5,"2025-11":86.0,"2025-12":87.3,"2026-01":84.0,"2026-02":86.0,"2026-03":88.3,"2026-04":90.2,"2026-05":89.0},"solo_avg18":null,"group_avg18":89.8,"solo_count18":0,"group_count18":100,"velocity":0.371,"baseline_vs":[{"d":"2025-02-10","score":103,"baseline":null,"vs":null},{"d":"2025-02-23","score":98,"baseline":103.0,"vs":-5.0},{"d":"2025-03-29","score":107,"baseline":100.5,"vs":6.5},{"d":"2025-04-17","score":97,"baseline":102.7,"vs":-5.7},{"d":"2025-04-28","score":115,"baseline":101.2,"vs":13.8},{"d":"2025-04-29","score":88,"baseline":104.0,"vs":-16.0},{"d":"2025-05-01","score":107,"baseline":101.3,"vs":5.7},{"d":"2025-05-23","score":88,"baseline":102.1,"vs":-14.1},{"d":"2025-05-23","score":97,"baseline":100.4,"vs":-3.4},{"d":"2025-05-25","score":99,"baseline":100.0,"vs":-1.0},{"d":"2025-05-25","score":94,"baseline":99.9,"vs":-5.9},{"d":"2025-05-25","score":96,"baseline":99.0,"vs":-3.0},{"d":"2025-05-29","score":99,"baseline":98.8,"vs":0.2},{"d":"2025-05-29","score":92,"baseline":98.0,"vs":-6.0},{"d":"2025-06-05","score":86,"baseline":97.5,"vs":-11.5},{"d":"2025-06-05","score":91,"baseline":94.6,"vs":-3.6},{"d":"2025-06-06","score":94,"baseline":94.9,"vs":-0.9},{"d":"2025-06-12","score":89,"baseline":93.6,"vs":-4.6},{"d":"2025-06-12","score":87,"baseline":93.7,"vs":-6.7},{"d":"2025-06-12","score":94,"baseline":92.7,"vs":1.3},{"d":"2025-06-14","score":91,"baseline":92.2,"vs":-1.2},{"d":"2025-06-14","score":85,"baseline":91.9,"vs":-6.9},{"d":"2025-06-14","score":89,"baseline":90.8,"vs":-1.8},{"d":"2025-06-27","score":82,"baseline":89.8,"vs":-7.8},{"d":"2025-06-27","score":85,"baseline":88.8,"vs":-3.8},{"d":"2025-06-27","score":84,"baseline":88.7,"vs":-4.7},{"d":"2025-07-05","score":79,"baseline":88.0,"vs":-9.0},{"d":"2025-07-11","score":95,"baseline":86.5,"vs":8.5},{"d":"2025-07-19","score":90,"baseline":87.1,"vs":2.9},{"d":"2025-07-19","score":83,"baseline":87.4,"vs":-4.4},{"d":"2025-07-23","score":86,"baseline":86.3,"vs":-0.3},{"d":"2025-07-23","score":95,"baseline":85.8,"vs":9.2},{"d":"2025-07-26","score":87,"baseline":86.8,"vs":0.2},{"d":"2025-08-01","score":90,"baseline":86.6,"vs":3.4},{"d":"2025-08-01","score":98,"baseline":87.4,"vs":10.6},{"d":"2025-08-01","score":112,"baseline":88.7,"vs":23.3},{"d":"2025-08-08","score":91,"baseline":91.5,"vs":-0.5},{"d":"2025-08-08","score":97,"baseline":92.7,"vs":4.3},{"d":"2025-08-08","score":100,"baseline":92.9,"vs":7.1},{"d":"2025-08-08","score":91,"baseline":93.9,"vs":-2.9},{"d":"2025-08-15","score":75,"baseline":94.7,"vs":-19.7},{"d":"2025-08-15","score":82,"baseline":93.6,"vs":-11.6},{"d":"2025-08-15","score":98,"baseline":92.3,"vs":5.7},{"d":"2025-08-18","score":84,"baseline":93.4,"vs":-9.4},{"d":"2025-08-21","score":85,"baseline":92.8,"vs":-7.8},{"d":"2025-08-21","score":76,"baseline":91.5,"vs":-15.5},{"d":"2025-08-22","score":90,"baseline":87.9,"vs":2.1},{"d":"2025-08-22","score":83,"baseline":87.8,"vs":-4.8},{"d":"2025-08-22","score":84,"baseline":86.4,"vs":-2.4},{"d":"2025-08-22","score":82,"baseline":84.8,"vs":-2.8},{"d":"2025-08-23","score":87,"baseline":83.9,"vs":3.1},{"d":"2025-08-28","score":88,"baseline":85.1,"vs":2.9},{"d":"2025-08-29","score":83,"baseline":85.7,"vs":-2.7},{"d":"2025-08-31","score":83,"baseline":84.2,"vs":-1.2},{"d":"2025-08-31","score":97,"baseline":84.1,"vs":12.9},{"d":"2025-09-08","score":81,"baseline":85.3,"vs":-4.3},{"d":"2025-09-17","score":85,"baseline":85.8,"vs":-0.8},{"d":"2025-09-19","score":85,"baseline":85.3,"vs":-0.3},{"d":"2025-09-19","score":80,"baseline":85.5,"vs":-5.5},{"d":"2025-09-19","score":86,"baseline":85.1,"vs":0.9},{"d":"2025-09-26","score":94,"baseline":85.5,"vs":8.5},{"d":"2025-10-02","score":84,"baseline":86.2,"vs":-2.2},{"d":"2025-10-05","score":97,"baseline":85.8,"vs":11.2},{"d":"2025-11-26","score":91,"baseline":87.2,"vs":3.8},{"d":"2025-11-26","score":80,"baseline":88.0,"vs":-8.0},{"d":"2025-11-26","score":87,"baseline":86.3,"vs":0.7},{"d":"2025-12-23","score":97,"baseline":86.9,"vs":10.1},{"d":"2025-12-23","score":86,"baseline":88.1,"vs":-2.1},{"d":"2025-12-23","score":79,"baseline":88.2,"vs":-9.2},{"d":"2026-01-07","score":84,"baseline":88.1,"vs":-4.1},{"d":"2026-02-21","score":86,"baseline":87.9,"vs":-1.9},{"d":"2026-02-21","score":75,"baseline":87.1,"vs":-12.1},{"d":"2026-02-28","score":97,"baseline":86.2,"vs":10.8},{"d":"2026-03-19","score":84,"baseline":86.2,"vs":-2.2},{"d":"2026-03-19","score":88,"baseline":85.5,"vs":2.5},{"d":"2026-03-19","score":91,"baseline":86.3,"vs":4.7},{"d":"2026-03-19","score":89,"baseline":86.7,"vs":2.3},{"d":"2026-03-20","score":90,"baseline":85.9,"vs":4.1},{"d":"2026-03-21","score":96,"baseline":86.3,"vs":9.7},{"d":"2026-03-26","score":94,"baseline":88.0,"vs":6.0},{"d":"2026-03-26","score":76,"baseline":89.0,"vs":-13.0},{"d":"2026-03-28","score":91,"baseline":88.0,"vs":3.0},{"d":"2026-03-28","score":84,"baseline":89.6,"vs":-5.6},{"d":"2026-04-02","score":86,"baseline":88.3,"vs":-2.3},{"d":"2026-04-02","score":84,"baseline":88.5,"vs":-4.5},{"d":"2026-04-04","score":88,"baseline":88.1,"vs":-0.1},{"d":"2026-04-04","score":90,"baseline":87.8,"vs":2.2},{"d":"2026-04-09","score":85,"baseline":87.9,"vs":-2.9},{"d":"2026-04-10","score":91,"baseline":87.4,"vs":3.6},{"d":"2026-04-11","score":90,"baseline":86.9,"vs":3.1},{"d":"2026-04-12","score":98,"baseline":86.5,"vs":11.5},{"d":"2026-04-12","score":83,"baseline":88.7,"vs":-5.7},{"d":"2026-04-17","score":102,"baseline":87.9,"vs":14.1},{"d":"2026-04-17","score":99,"baseline":89.7,"vs":9.3},{"d":"2026-04-17","score":97,"baseline":91.0,"vs":6.0},{"d":"2026-04-18","score":88,"baseline":92.3,"vs":-4.3},{"d":"2026-04-30","score":96,"baseline":92.3,"vs":3.7},{"d":"2026-04-30","score":86,"baseline":92.9,"vs":-6.9},{"d":"2026-04-30","score":81,"baseline":93.0,"vs":-12.0},{"d":"2026-05-02","score":89,"baseline":92.0,"vs":-3.0}],"last_vs_baseline":-3.0,"std5":5.43,"std10":7.37,"blowup_avg18":4.7,"blowup_recent18":4.0,"birdies_recent18":0.6,"birdies_prior18":0.69,"sim_index":12.5,"avg_fir18":5.5,"avg_gir18":4.5,"archetype":["PRECISION","Precision Machine"],"unique_courses":71,"score_dist":{"<80":6,"80-84":20,"85-89":27,"90-94":20,"95-99":20,"100+":7},"color":"#60a5fa","avg_eagles18":0.01,"avg_birdies18":0.68,"avg_pars18":5.59,"avg_bogeys18":6.84,"avg_dbl18":3.07,"avg_drive18":214.5,"avg_net18":83.2,"nemesis":{"p":"Mad","w":0,"l":6,"t":0,"tot":6},"prey":{"p":"Dapp","w":5,"l":0,"t":0,"tot":5},"win_rate":44.8,"total_games":134},"Dapp":{"count":5,"count18":5,"avg18":101.0,"best18":95,"worst18":107,"std18":4.42,"grade":"A","glabel":"Machine","form_diff":0.0,"form_label":"Steady","peak":{"avg":101.0,"end":"2026-02-28"},"trend18":[{"d":"2025-05-23","s":100,"a":100.0},{"d":"2025-08-22","s":95,"a":97.5},{"d":"2025-08-31","s":100,"a":98.3},{"d":"2025-09-19","s":103,"a":99.5},{"d":"2026-02-28","s":107,"a":101.0}],"monthly_avg":{"2025-05":100.0,"2025-08":97.5,"2025-09":103.0,"2026-02":107.0},"solo_avg18":null,"group_avg18":101.0,"solo_count18":0,"group_count18":5,"velocity":null,"baseline_vs":[{"d":"2025-05-23","score":100,"baseline":null,"vs":null},{"d":"2025-08-22","score":95,"baseline":100.0,"vs":-5.0},{"d":"2025-08-31","score":100,"baseline":97.5,"vs":2.5},{"d":"2025-09-19","score":103,"baseline":98.3,"vs":4.7},{"d":"2026-02-28","score":107,"baseline":99.5,"vs":7.5}],"last_vs_baseline":7.5,"std5":4.42,"std10":4.42,"blowup_avg18":9.0,"blowup_recent18":9.0,"birdies_recent18":0.0,"birdies_prior18":null,"sim_index":null,"avg_fir18":7.0,"avg_gir18":1.0,"archetype":["FAIRWAY","Fairway Hunter"],"unique_courses":5,"score_dist":{"<80":0,"80-84":0,"85-89":0,"90-94":0,"95-99":1,"100+":4},"color":"#f472b6","avg_eagles18":0.0,"avg_birdies18":0.0,"avg_pars18":3.0,"avg_bogeys18":5.8,"avg_dbl18":5.4,"avg_drive18":198.9,"avg_net18":82.2,"nemesis":{"p":"Brad","w":0,"l":3,"t":0,"tot":3},"prey":{"p":"Brad","w":0,"l":3,"t":0,"tot":3},"win_rate":0.0,"total_games":13},"Jack":{"count":10,"count18":10,"avg18":86.4,"best18":75,"worst18":109,"std18":10.78,"grade":"D","glabel":"Wild","form_diff":6.0,"form_label":"Scorching","peak":{"avg":80.4,"end":"2026-04-12"},"trend18":[{"d":"2025-02-23","s":92,"a":92.0},{"d":"2025-07-05","s":75,"a":83.5},{"d":"2025-07-26","s":109,"a":92.0},{"d":"2025-08-01","s":95,"a":92.8},{"d":"2025-08-15","s":91,"a":92.4},{"d":"2025-08-15","s":75,"a":89.0},{"d":"2025-08-18","s":75,"a":89.0},{"d":"2026-03-20","s":85,"a":84.2},{"d":"2026-03-26","s":84,"a":82.0},{"d":"2026-04-12","s":83,"a":80.4}],"monthly_avg":{"2025-02":92.0,"2025-07":92.0,"2025-08":84.0,"2026-03":84.5,"2026-04":83.0},"solo_avg18":null,"group_avg18":86.4,"solo_count18":0,"group_count18":10,"velocity":-1.297,"baseline_vs":[{"d":"2025-02-23","score":92,"baseline":null,"vs":null},{"d":"2025-07-05","score":75,"baseline":92.0,"vs":-17.0},{"d":"2025-07-26","score":109,"baseline":83.5,"vs":25.5},{"d":"2025-08-01","score":95,"baseline":92.0,"vs":3.0},{"d":"2025-08-15","score":91,"baseline":92.8,"vs":-1.8},{"d":"2025-08-15","score":75,"baseline":92.4,"vs":-17.4},{"d":"2025-08-18","score":75,"baseline":89.5,"vs":-14.5},{"d":"2026-03-20","score":85,"baseline":87.4,"vs":-2.4},{"d":"2026-03-26","score":84,"baseline":87.1,"vs":-3.1},{"d":"2026-04-12","score":83,"baseline":86.8,"vs":-3.8}],"last_vs_baseline":-3.8,"std5":4.98,"std10":10.78,"blowup_avg18":3.8,"blowup_recent18":2.6,"birdies_recent18":1.4,"birdies_prior18":1.0,"sim_index":5.6,"avg_fir18":4.4,"avg_gir18":5.2,"archetype":["IRON","Iron Player"],"unique_courses":8,"score_dist":{"<80":3,"80-84":2,"85-89":1,"90-94":2,"95-99":1,"100+":1},"color":"#a78bfa","avg_eagles18":0.1,"avg_birdies18":1.1,"avg_pars18":6.8,"avg_bogeys18":5.4,"avg_dbl18":2.3,"avg_drive18":230.1,"avg_net18":84.3,"nemesis":{"p":"Baumbach","w":0,"l":3,"t":0,"tot":3},"prey":{"p":"Dan","w":7,"l":2,"t":1,"tot":10},"win_rate":47.8,"total_games":23},"Mad":{"count":6,"count18":6,"avg18":82.3,"best18":76,"worst18":91,"std18":5.28,"grade":"B","glabel":"Steady","form_diff":0.5,"form_label":"Steady","peak":{"avg":81.8,"end":"2025-06-27"},"trend18":[{"d":"2025-04-17","s":85,"a":85.0},{"d":"2025-05-25","s":91,"a":88.0},{"d":"2025-05-25","s":76,"a":84.0},{"d":"2025-05-25","s":80,"a":83.0},{"d":"2025-06-27","s":79,"a":82.2},{"d":"2025-06-27","s":83,"a":81.8}],"monthly_avg":{"2025-04":85.0,"2025-05":82.3,"2025-06":81.0},"solo_avg18":null,"group_avg18":82.3,"solo_count18":0,"group_count18":6,"velocity":null,"baseline_vs":[{"d":"2025-04-17","score":85,"baseline":null,"vs":null},{"d":"2025-05-25","score":91,"baseline":85.0,"vs":6.0},{"d":"2025-05-25","score":76,"baseline":88.0,"vs":-12.0},{"d":"2025-05-25","score":80,"baseline":84.0,"vs":-4.0},{"d":"2025-06-27","score":79,"baseline":83.0,"vs":-4.0},{"d":"2025-06-27","score":83,"baseline":82.2,"vs":0.8}],"last_vs_baseline":0.8,"std5":5.72,"std10":5.28,"blowup_avg18":2.67,"blowup_recent18":2.4,"birdies_recent18":2.0,"birdies_prior18":2.0,"sim_index":7.3,"avg_fir18":4.5,"avg_gir18":7.2,"archetype":["IRON","Iron Player"],"unique_courses":6,"score_dist":{"<80":2,"80-84":2,"85-89":1,"90-94":1,"95-99":0,"100+":0},"color":"#34d399","avg_eagles18":0.17,"avg_birdies18":1.83,"avg_pars18":6.83,"avg_bogeys18":8.0,"avg_dbl18":1.5,"avg_drive18":233.6,"avg_net18":77.2,"nemesis":{"p":"Dan","w":6,"l":0,"t":0,"tot":6},"prey":{"p":"Dan","w":6,"l":0,"t":0,"tot":6},"win_rate":92.3,"total_games":13},"Tobby":{"count":86,"count18":86,"avg18":90.6,"best18":77,"worst18":112,"std18":6.39,"grade":"B","glabel":"Steady","form_diff":4.6,"form_label":"Scorching","peak":{"avg":82.8,"end":"2026-04-17"},"trend18":[{"d":"2025-04-17","s":112,"a":112.0},{"d":"2025-05-01","s":101,"a":106.5},{"d":"2025-05-23","s":95,"a":102.7},{"d":"2025-05-23","s":93,"a":100.2},{"d":"2025-05-25","s":105,"a":101.2},{"d":"2025-05-25","s":98,"a":98.4},{"d":"2025-05-25","s":100,"a":98.2},{"d":"2025-05-29","s":99,"a":99.0},{"d":"2025-05-29","s":87,"a":97.8},{"d":"2025-06-05","s":94,"a":95.6},{"d":"2025-06-05","s":91,"a":94.2},{"d":"2025-06-06","s":87,"a":91.6},{"d":"2025-06-12","s":96,"a":91.0},{"d":"2025-06-12","s":90,"a":91.6},{"d":"2025-06-12","s":100,"a":92.8},{"d":"2025-06-14","s":91,"a":92.8},{"d":"2025-06-14","s":88,"a":93.0},{"d":"2025-06-14","s":99,"a":93.6},{"d":"2025-06-27","s":82,"a":92.0},{"d":"2025-06-27","s":83,"a":88.6},{"d":"2025-06-27","s":95,"a":89.4},{"d":"2025-07-05","s":90,"a":89.8},{"d":"2025-07-11","s":92,"a":88.4},{"d":"2025-07-19","s":100,"a":92.0},{"d":"2025-07-19","s":97,"a":94.8},{"d":"2025-07-23","s":84,"a":92.6},{"d":"2025-07-23","s":84,"a":91.4},{"d":"2025-08-01","s":86,"a":90.2},{"d":"2025-08-01","s":86,"a":87.4},{"d":"2025-08-01","s":96,"a":87.2},{"d":"2025-08-08","s":90,"a":88.4},{"d":"2025-08-08","s":90,"a":89.6},{"d":"2025-08-08","s":97,"a":91.8},{"d":"2025-08-08","s":83,"a":91.2},{"d":"2025-08-15","s":89,"a":89.8},{"d":"2025-08-15","s":85,"a":88.8},{"d":"2025-08-15","s":89,"a":88.6},{"d":"2025-08-21","s":92,"a":87.6},{"d":"2025-08-21","s":88,"a":88.6},{"d":"2025-08-22","s":85,"a":87.8},{"d":"2025-08-22","s":91,"a":89.0},{"d":"2025-08-22","s":98,"a":90.8},{"d":"2025-08-22","s":81,"a":88.6},{"d":"2025-08-23","s":88,"a":88.6},{"d":"2025-08-28","s":87,"a":89.0},{"d":"2025-08-29","s":81,"a":87.0},{"d":"2025-08-31","s":90,"a":85.4},{"d":"2025-08-31","s":91,"a":87.4},{"d":"2025-09-08","s":91,"a":88.0},{"d":"2025-09-17","s":90,"a":88.6},{"d":"2025-09-19","s":97,"a":91.8},{"d":"2025-09-19","s":90,"a":91.8},{"d":"2025-09-19","s":83,"a":90.2},{"d":"2025-09-26","s":91,"a":90.2},{"d":"2025-10-02","s":91,"a":90.4},{"d":"2025-10-05","s":93,"a":89.6},{"d":"2025-11-26","s":94,"a":90.4},{"d":"2025-11-26","s":93,"a":92.4},{"d":"2025-11-26","s":92,"a":92.6},{"d":"2025-12-23","s":93,"a":93.0},{"d":"2025-12-23","s":89,"a":92.2},{"d":"2025-12-23","s":97,"a":92.8},{"d":"2026-02-21","s":88,"a":91.8},{"d":"2026-02-28","s":95,"a":92.4},{"d":"2026-03-19","s":89,"a":91.6},{"d":"2026-03-19","s":90,"a":91.8},{"d":"2026-03-19","s":98,"a":92.0},{"d":"2026-03-19","s":96,"a":93.6},{"d":"2026-03-20","s":98,"a":94.2},{"d":"2026-03-21","s":102,"a":96.8},{"d":"2026-03-26","s":89,"a":96.6},{"d":"2026-03-26","s":83,"a":93.6},{"d":"2026-04-02","s":86,"a":91.6},{"d":"2026-04-02","s":80,"a":88.0},{"d":"2026-04-04","s":91,"a":85.8},{"d":"2026-04-04","s":86,"a":85.2},{"d":"2026-04-12","s":84,"a":85.4},{"d":"2026-04-12","s":79,"a":84.0},{"d":"2026-04-17","s":85,"a":85.0},{"d":"2026-04-17","s":80,"a":82.8},{"d":"2026-04-17","s":86,"a":82.8},{"d":"2026-04-18","s":94,"a":84.8},{"d":"2026-04-30","s":77,"a":84.4},{"d":"2026-04-30","s":87,"a":84.8},{"d":"2026-04-30","s":80,"a":84.8},{"d":"2026-05-02","s":92,"a":86.0}],"monthly_avg":{"2025-04":112.0,"2025-05":97.2,"2025-06":91.3,"2025-07":91.2,"2025-08":88.7,"2025-09":90.3,"2025-10":92.0,"2025-11":93.0,"2025-12":93.0,"2026-02":91.5,"2026-03":93.1,"2026-04":84.2,"2026-05":92.0},"solo_avg18":null,"group_avg18":90.6,"solo_count18":0,"group_count18":86,"velocity":-0.638,"baseline_vs":[{"d":"2025-04-17","score":112,"baseline":null,"vs":null},{"d":"2025-05-01","score":101,"baseline":112.0,"vs":-11.0},{"d":"2025-05-23","score":95,"baseline":106.5,"vs":-11.5},{"d":"2025-05-23","score":93,"baseline":102.7,"vs":-9.7},{"d":"2025-05-25","score":105,"baseline":100.2,"vs":4.8},{"d":"2025-05-25","score":98,"baseline":101.2,"vs":-3.2},{"d":"2025-05-25","score":100,"baseline":100.7,"vs":-0.7},{"d":"2025-05-29","score":99,"baseline":100.6,"vs":-1.6},{"d":"2025-05-29","score":87,"baseline":100.4,"vs":-13.4},{"d":"2025-06-05","score":94,"baseline":98.9,"vs":-4.9},{"d":"2025-06-05","score":91,"baseline":98.4,"vs":-7.4},{"d":"2025-06-06","score":87,"baseline":96.3,"vs":-9.3},{"d":"2025-06-12","score":96,"baseline":94.9,"vs":1.1},{"d":"2025-06-12","score":90,"baseline":95.0,"vs":-5.0},{"d":"2025-06-12","score":100,"baseline":94.7,"vs":5.3},{"d":"2025-06-14","score":91,"baseline":94.2,"vs":-3.2},{"d":"2025-06-14","score":88,"baseline":93.5,"vs":-5.5},{"d":"2025-06-14","score":99,"baseline":92.3,"vs":6.7},{"d":"2025-06-27","score":82,"baseline":92.3,"vs":-10.3},{"d":"2025-06-27","score":83,"baseline":91.8,"vs":-8.8},{"d":"2025-06-27","score":95,"baseline":90.7,"vs":4.3},{"d":"2025-07-05","score":90,"baseline":91.1,"vs":-1.1},{"d":"2025-07-11","score":92,"baseline":91.4,"vs":0.6},{"d":"2025-07-19","score":100,"baseline":91.0,"vs":9.0},{"d":"2025-07-19","score":97,"baseline":92.0,"vs":5.0},{"d":"2025-07-23","score":84,"baseline":91.7,"vs":-7.7},{"d":"2025-07-23","score":84,"baseline":91.0,"vs":-7.0},{"d":"2025-08-01","score":86,"baseline":90.6,"vs":-4.6},{"d":"2025-08-01","score":86,"baseline":89.3,"vs":-3.3},{"d":"2025-08-01","score":96,"baseline":89.7,"vs":6.3},{"d":"2025-08-08","score":90,"baseline":91.0,"vs":-1.0},{"d":"2025-08-08","score":90,"baseline":90.5,"vs":-0.5},{"d":"2025-08-08","score":97,"baseline":90.5,"vs":6.5},{"d":"2025-08-08","score":83,"baseline":91.0,"vs":-8.0},{"d":"2025-08-15","score":89,"baseline":89.3,"vs":-0.3},{"d":"2025-08-15","score":85,"baseline":88.5,"vs":-3.5},{"d":"2025-08-15","score":89,"baseline":88.6,"vs":0.4},{"d":"2025-08-21","score":92,"baseline":89.1,"vs":2.9},{"d":"2025-08-21","score":88,"baseline":89.7,"vs":-1.7},{"d":"2025-08-22","score":85,"baseline":89.9,"vs":-4.9},{"d":"2025-08-22","score":91,"baseline":88.8,"vs":2.2},{"d":"2025-08-22","score":98,"baseline":88.9,"vs":9.1},{"d":"2025-08-22","score":81,"baseline":89.7,"vs":-8.7},{"d":"2025-08-23","score":88,"baseline":88.1,"vs":-0.1},{"d":"2025-08-28","score":87,"baseline":88.6,"vs":-1.6},{"d":"2025-08-29","score":81,"baseline":88.4,"vs":-7.4},{"d":"2025-08-31","score":90,"baseline":88.0,"vs":2.0},{"d":"2025-08-31","score":91,"baseline":88.1,"vs":2.9},{"d":"2025-09-08","score":91,"baseline":88.0,"vs":3.0},{"d":"2025-09-17","score":90,"baseline":88.3,"vs":1.7},{"d":"2025-09-19","score":97,"baseline":88.8,"vs":8.2},{"d":"2025-09-19","score":90,"baseline":89.4,"vs":0.6},{"d":"2025-09-19","score":83,"baseline":88.6,"vs":-5.6},{"d":"2025-09-26","score":91,"baseline":88.8,"vs":2.2},{"d":"2025-10-02","score":91,"baseline":89.1,"vs":1.9},{"d":"2025-10-05","score":93,"baseline":89.5,"vs":3.5},{"d":"2025-11-26","score":94,"baseline":90.7,"vs":3.3},{"d":"2025-11-26","score":93,"baseline":91.1,"vs":1.9},{"d":"2025-11-26","score":92,"baseline":91.3,"vs":0.7},{"d":"2025-12-23","score":93,"baseline":91.4,"vs":1.6},{"d":"2025-12-23","score":89,"baseline":91.7,"vs":-2.7},{"d":"2025-12-23","score":97,"baseline":90.9,"vs":6.1},{"d":"2026-02-21","score":88,"baseline":91.6,"vs":-3.6},{"d":"2026-02-28","score":95,"baseline":92.1,"vs":2.9},{"d":"2026-03-19","score":89,"baseline":92.5,"vs":-3.5},{"d":"2026-03-19","score":90,"baseline":92.3,"vs":-2.3},{"d":"2026-03-19","score":98,"baseline":92.0,"vs":6.0},{"d":"2026-03-19","score":96,"baseline":92.4,"vs":3.6},{"d":"2026-03-20","score":98,"baseline":92.7,"vs":5.3},{"d":"2026-03-21","score":102,"baseline":93.3,"vs":8.7},{"d":"2026-03-26","score":89,"baseline":94.2,"vs":-5.2},{"d":"2026-03-26","score":83,"baseline":94.2,"vs":-11.2},{"d":"2026-04-02","score":86,"baseline":92.8,"vs":-6.8},{"d":"2026-04-02","score":80,"baseline":92.6,"vs":-12.6},{"d":"2026-04-04","score":91,"baseline":91.1,"vs":-0.1},{"d":"2026-04-04","score":86,"baseline":91.3,"vs":-5.3},{"d":"2026-04-12","score":84,"baseline":90.9,"vs":-6.9},{"d":"2026-04-12","score":79,"baseline":89.5,"vs":-10.5},{"d":"2026-04-17","score":85,"baseline":87.8,"vs":-2.8},{"d":"2026-04-17","score":80,"baseline":86.5,"vs":-6.5},{"d":"2026-04-17","score":86,"baseline":84.3,"vs":1.7},{"d":"2026-04-18","score":94,"baseline":84.0,"vs":10.0},{"d":"2026-04-30","score":77,"baseline":85.1,"vs":-8.1},{"d":"2026-04-30","score":87,"baseline":84.2,"vs":2.8},{"d":"2026-04-30","score":80,"baseline":84.9,"vs":-4.9},{"d":"2026-05-02","score":92,"baseline":83.8,"vs":8.2}],"last_vs_baseline":8.2,"std5":7.38,"std10":5.6,"blowup_avg18":4.91,"blowup_recent18":3.2,"birdies_recent18":0.8,"birdies_prior18":0.37,"sim_index":11.0,"avg_fir18":5.8,"avg_gir18":3.3,"archetype":["FAIRWAY","Fairway Hunter"],"unique_courses":62,"score_dist":{"<80":2,"80-84":13,"85-89":21,"90-94":27,"95-99":16,"100+":7},"color":"#f87171","avg_eagles18":0.0,"avg_birdies18":0.4,"avg_pars18":5.28,"avg_bogeys18":7.36,"avg_dbl18":3.26,"avg_drive18":192.5,"avg_net18":76.2,"nemesis":{"p":"Mad","w":0,"l":5,"t":1,"tot":6},"prey":{"p":"Dapp","w":5,"l":0,"t":0,"tot":5},"win_rate":41.5,"total_games":118}};
 const H2H         = {"Baumbach":{"Brad":{"w":0,"l":0,"t":0},"Dan":{"w":3,"l":1,"t":1},"Dapp":{"w":0,"l":0,"t":0},"Jack":{"w":3,"l":0,"t":0},"Mad":{"w":0,"l":0,"t":0},"Tobby":{"w":1,"l":3,"t":0}},"Brad":{"Baumbach":{"w":0,"l":0,"t":0},"Dan":{"w":15,"l":7,"t":0},"Dapp":{"w":3,"l":0,"t":0},"Jack":{"w":2,"l":0,"t":1},"Mad":{"w":0,"l":1,"t":0},"Tobby":{"w":8,"l":2,"t":0}},"Dan":{"Baumbach":{"w":1,"l":3,"t":1},"Brad":{"w":7,"l":15,"t":0},"Dapp":{"w":5,"l":0,"t":0},"Jack":{"w":2,"l":7,"t":1},"Mad":{"w":0,"l":6,"t":0},"Tobby":{"w":45,"l":36,"t":5}},"Dapp":{"Baumbach":{"w":0,"l":0,"t":0},"Brad":{"w":0,"l":3,"t":0},"Dan":{"w":0,"l":5,"t":0},"Jack":{"w":0,"l":0,"t":0},"Mad":{"w":0,"l":0,"t":0},"Tobby":{"w":0,"l":5,"t":0}},"Jack":{"Baumbach":{"w":0,"l":3,"t":0},"Brad":{"w":0,"l":2,"t":1},"Dan":{"w":7,"l":2,"t":1},"Dapp":{"w":0,"l":0,"t":0},"Mad":{"w":0,"l":0,"t":0},"Tobby":{"w":4,"l":3,"t":0}},"Mad":{"Baumbach":{"w":0,"l":0,"t":0},"Brad":{"w":1,"l":0,"t":0},"Dan":{"w":6,"l":0,"t":0},"Dapp":{"w":0,"l":0,"t":0},"Jack":{"w":0,"l":0,"t":0},"Tobby":{"w":5,"l":0,"t":1}},"Tobby":{"Baumbach":{"w":3,"l":1,"t":0},"Brad":{"w":2,"l":8,"t":0},"Dan":{"w":36,"l":45,"t":5},"Dapp":{"w":5,"l":0,"t":0},"Jack":{"w":3,"l":4,"t":0},"Mad":{"w":0,"l":5,"t":1}}};
-const TOP_COURSES = [{"name":"Estancia Club","count":21},{"name":"Bandon Dunes","count":9},{"name":"Noble Hawk Golf Links","count":8},{"name":"Fishers Island Club","count":7},{"name":"Cabot Cliffs Patreon","count":7},{"name":"Ironhorse Kansas","count":7},{"name":"Quail Valley Golf Club","count":6},{"name":"Paradise Pointe - The Posse","count":6},{"name":"The Ridge Golf Club","count":6},{"name":"Kauri Cliffs","count":5},{"name":"Heritage Pointe - Heritage/Desert","count":5},{"name":"Gilded Dunes","count":5}];
-const MONTHLY     = {"months":["2025-02","2025-03","2025-04","2025-05","2025-06","2025-07","2025-08","2025-09","2025-10","2025-11","2025-12","2026-01","2026-02","2026-03","2026-04","2026-05"],"by_player":{"Baumbach":[0,0,0,0,0,1,1,0,0,0,0,0,0,1,2,0],"Brad":[2,1,2,1,0,1,3,1,0,0,0,1,2,3,5,0],"Dan":[2,1,3,8,12,7,22,6,2,3,3,1,3,10,16,1],"Dapp":[0,0,0,1,0,0,2,1,0,0,0,0,1,0,0,0],"Jack":[1,0,0,0,0,2,4,0,0,0,0,0,0,2,1,0],"Mad":[0,0,1,3,2,0,0,0,0,0,0,0,0,0,0,0],"Tobby":[0,0,1,8,12,6,21,6,2,3,3,0,2,8,13,1]}};
+const TOP_COURSES      = [{"name":"Estancia Club","count":21},{"name":"Bandon Dunes","count":9},{"name":"Noble Hawk Golf Links","count":8},{"name":"Fishers Island Club","count":7},{"name":"Cabot Cliffs Patreon","count":7},{"name":"Ironhorse Kansas","count":7},{"name":"Quail Valley Golf Club","count":6},{"name":"Paradise Pointe - The Posse","count":6},{"name":"The Ridge Golf Club","count":6},{"name":"Kauri Cliffs","count":5},{"name":"Heritage Pointe - Heritage/Desert","count":5},{"name":"Gilded Dunes","count":5}];
+const MONTHLY          = {"months":["2025-02","2025-03","2025-04","2025-05","2025-06","2025-07","2025-08","2025-09","2025-10","2025-11","2025-12","2026-01","2026-02","2026-03","2026-04","2026-05"],"by_player":{"Baumbach":[0,0,0,0,0,1,1,0,0,0,0,0,0,1,2,0],"Brad":[2,1,2,1,0,1,3,1,0,0,0,1,2,3,5,0],"Dan":[2,1,3,8,12,7,22,6,2,3,3,1,3,10,16,1],"Dapp":[0,0,0,1,0,0,2,1,0,0,0,0,1,0,0,0],"Jack":[1,0,0,0,0,2,4,0,0,0,0,0,0,2,1,0],"Mad":[0,0,1,3,2,0,0,0,0,0,0,0,0,0,0,0],"Tobby":[0,0,1,8,12,6,21,6,2,3,3,0,2,8,13,1]}};
+const RECENT_SESSIONS  = [{"roundId":"f11e1573-9bb0-4d23-9810-40e056319157","date":"2026-05-02","course":"Montei Rei","players":[{"player":"Dan","score":89,"net":75,"birdies":1,"pars":6,"bogeys":6,"doubles":3,"others":0,"gir_pct":28,"fir_pct":31,"driving":237},{"player":"Tobby","score":92,"net":79,"birdies":1,"pars":5,"bogeys":5,"doubles":5,"others":1,"gir_pct":12,"fir_pct":17,"driving":265}]},{"roundId":"5e481d4a-ef3e-442e-95ad-47746af2655b","date":"2026-04-30","course":"Baylands Golf Links","players":[{"player":"Tobby","score":77,"net":67,"birdies":1,"pars":12,"bogeys":4,"doubles":1,"others":0,"gir_pct":39,"fir_pct":69,"driving":269},{"player":"Dan","score":96,"net":85,"birdies":0,"pars":3,"bogeys":8,"doubles":3,"others":4,"gir_pct":17,"fir_pct":85,"driving":229}]},{"roundId":"f3510491-4dd1-40c3-93a4-c3b0933da083","date":"2026-04-30","course":"Bandon Dunes","players":[{"player":"Dan","score":86,"net":73,"birdies":0,"pars":8,"bogeys":6,"doubles":4,"others":0,"gir_pct":39,"fir_pct":43,"driving":221},{"player":"Tobby","score":87,"net":74,"birdies":1,"pars":7,"bogeys":6,"doubles":2,"others":1,"gir_pct":33,"fir_pct":43,"driving":268}]},{"roundId":"823accd8-cd95-4246-b2a8-2e0888686180","date":"2026-04-30","course":"Bandon Trails","players":[{"player":"Tobby","score":80,"net":66,"birdies":1,"pars":8,"bogeys":8,"doubles":1,"others":0,"gir_pct":50,"fir_pct":21,"driving":246},{"player":"Dan","score":81,"net":67,"birdies":2,"pars":8,"bogeys":6,"doubles":2,"others":0,"gir_pct":56,"fir_pct":64,"driving":248}]},{"roundId":"81fa597b-42ca-46c7-93ed-c8879ead2754","date":"2026-04-18","course":"Samoset Golf Resort","players":[{"player":"Brad","score":79,"net":70,"birdies":2,"pars":8,"bogeys":6,"doubles":1,"others":1,"gir_pct":39,"fir_pct":31,"driving":238},{"player":"Dan","score":88,"net":75,"birdies":0,"pars":6,"bogeys":8,"doubles":2,"others":2,"gir_pct":22,"fir_pct":38,"driving":235},{"player":"Tobby","score":94,"net":80,"birdies":0,"pars":3,"bogeys":9,"doubles":3,"others":2,"gir_pct":11,"fir_pct":8,"driving":155}]},{"roundId":"5b639722-917a-4730-9792-777a74c3813b","date":"2026-04-17","course":"Teton Pines Golf Course","players":[{"player":"Tobby","score":85,"net":73,"birdies":2,"pars":8,"bogeys":3,"doubles":3,"others":2,"gir_pct":39,"fir_pct":14,"driving":261},{"player":"Dan","score":102,"net":93,"birdies":1,"pars":2,"bogeys":4,"doubles":6,"others":5,"gir_pct":22,"fir_pct":29,"driving":241}]},{"roundId":"4244577f-3f6f-48a6-82ae-911ef80bd794","date":"2026-04-17","course":"TBC Virtues","players":[{"player":"Tobby","score":80,"net":67,"birdies":2,"pars":8,"bogeys":6,"doubles":2,"others":0,"gir_pct":33,"fir_pct":21,"driving":260},{"player":"Dan","score":99,"net":90,"birdies":1,"pars":4,"bogeys":3,"doubles":5,"others":3,"gir_pct":24,"fir_pct":23,"driving":217}]},{"roundId":"04790c46-58a1-4420-8e78-8bd6219d8345","date":"2026-04-17","course":"Manele Golf Course","players":[{"player":"Tobby","score":86,"net":75,"birdies":1,"pars":4,"bogeys":11,"doubles":2,"others":0,"gir_pct":28,"fir_pct":23,"driving":272},{"player":"Dan","score":97,"net":91,"birdies":1,"pars":4,"bogeys":4,"doubles":5,"others":4,"gir_pct":39,"fir_pct":0,"driving":null}]},{"roundId":"fd4f4222-9c75-488c-a470-0290f3d89be3","date":"2026-04-12","course":"Fishers Island Club","players":[{"player":"Tobby","score":84,"net":null,"birdies":1,"pars":10,"bogeys":2,"doubles":4,"others":1,"gir_pct":33,"fir_pct":36,"driving":192},{"player":"Baumbach","score":86,"net":null,"birdies":1,"pars":5,"bogeys":9,"doubles":3,"others":0,"gir_pct":39,"fir_pct":43,"driving":244},{"player":"Dan","score":98,"net":null,"birdies":0,"pars":2,"bogeys":7,"doubles":8,"others":0,"gir_pct":6,"fir_pct":29,"driving":213}]},{"roundId":"fb6f4b8a-296b-489c-9699-944890dbb47a","date":"2026-04-12","course":"Quail Valley Golf Club","players":[{"player":"Tobby","score":79,"net":68,"birdies":2,"pars":8,"bogeys":7,"doubles":1,"others":0,"gir_pct":39,"fir_pct":21,"driving":247},{"player":"Baumbach","score":82,"net":78,"birdies":1,"pars":9,"bogeys":6,"doubles":1,"others":1,"gir_pct":28,"fir_pct":29,"driving":257},{"player":"Dan","score":83,"net":78,"birdies":1,"pars":9,"bogeys":5,"doubles":2,"others":0,"gir_pct":56,"fir_pct":50,"driving":207},{"player":"Jack","score":83,"net":83,"birdies":2,"pars":8,"bogeys":4,"doubles":3,"others":1,"gir_pct":33,"fir_pct":21,"driving":225}]}];
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let activePlayer = 'all';
@@ -723,7 +725,8 @@ function initials(name){
 document.addEventListener('DOMContentLoaded', () => {
   renderPills();
   renderKpiStrip();
-  renderStage();
+  renderSessionsFeed();
+  renderLastSession();
   renderLeaderboard();
   initTrendChart();
   initBaselineChart();
@@ -802,7 +805,8 @@ function setPlayer(p) {
   if (crumb) crumb.textContent = p==='all' ? 'All Players' : p;
   renderPills();
   renderKpiStrip();
-  renderStage();
+  renderSessionsFeed();
+  renderLastSession();
   renderLeaderboard();
   updateTrendChart();
   updateBaselineChart();
@@ -861,135 +865,143 @@ function renderKpiStrip() {
   ].join('');
 }
 
-// ── Stage (feature panel + gauge + stat-pair) ─────────────────────────────────
-function renderStage() {
-  const el = document.getElementById('stage');
-  const players = rankedPlayers();
-
-  let featured, eyebrow, tag, statBlocks, gaugeVal, gaugeLabel, gaugeColor;
-
+// ── Recent Sessions Feed (Option A) ──────────────────────────────────────────
+function renderSessionsFeed() {
+  const el = document.getElementById('sessionsFeed');
+  let sessions = RECENT_SESSIONS;
   if (activePlayer !== 'all') {
-    const p = activePlayer;
-    const pp = PER_PLAYER[p];
-    featured  = p;
-    eyebrow   = 'Player Spotlight';
-    tag       = `${pp.archetype[1]} · ${pp.glabel}`;
-    statBlocks = [
-      ['Avg 18H',    pp.avg18!=null?fmt1(pp.avg18):'—'],
-      ['Best',       pp.best18??'—'],
-      ['Rounds',     pp.count],
-      ['H2H Win%',   `${pp.win_rate}%`],
-    ];
-    // Gauge: percentile (lower avg = higher percentile of group)
-    const allAvgs = PLAYERS.map(x=>PER_PLAYER[x].avg18).filter(v=>v!=null);
-    if (pp.avg18!=null && allAvgs.length){
-      const better = allAvgs.filter(v=>v>=pp.avg18).length;
-      gaugeVal   = Math.round(better/allAvgs.length*100);
-      gaugeLabel = 'Group Percentile';
-    } else {
-      gaugeVal = 50; gaugeLabel = 'No data';
-    }
-    gaugeColor = COLORS[p] || 'var(--accent)';
-  } else {
-    const sorted18 = players.filter(p=>PER_PLAYER[p].avg18!=null).sort((a,b)=>PER_PLAYER[a].avg18-PER_PLAYER[b].avg18);
-    const leader = sorted18[0];
-    const pp = leader ? PER_PLAYER[leader] : null;
-    featured  = leader || '—';
-    eyebrow   = 'Scoring Leader';
-    tag       = pp ? `${pp.archetype[1]} · grade ${pp.grade}` : '';
-    statBlocks = pp ? [
-      ['Avg 18H',    fmt1(pp.avg18)],
-      ['Best',       pp.best18],
-      ['Rounds',     pp.count],
-      ['Form',       pp.form_label||'—'],
-    ] : [];
-    // Gauge: form_diff scaled
-    if (pp && pp.form_diff!=null) {
-      gaugeVal = Math.max(0, Math.min(100, Math.round(50 + pp.form_diff*8)));
-      gaugeLabel = pp.form_label || 'Current Form';
-    } else {
-      gaugeVal = 60; gaugeLabel = 'Form trend';
-    }
-    gaugeColor = leader ? (COLORS[leader]||'var(--accent)') : 'var(--accent)';
+    sessions = sessions.filter(s => s.players.some(p => p.player === activePlayer));
   }
-
-  const featCol = COLORS[featured] || 'var(--accent)';
-  const featStatsHtml = statBlocks.map(([l,v])=>`<div class="feature-stat"><div class="fs-label">${l}</div><div class="fs-value">${v}</div></div>`).join('');
-
-  // hottest form & most consistent for side stat-pair (always shown)
-  const eligible = eligiblePlayers();
-  const hottest = eligible.filter(p=>PER_PLAYER[p].form_diff!=null).sort((a,b)=>PER_PLAYER[b].form_diff-PER_PLAYER[a].form_diff)[0];
-  const mostConsistent = eligible.filter(p=>PER_PLAYER[p].std18!=null).sort((a,b)=>PER_PLAYER[a].std18-PER_PLAYER[b].std18)[0];
-  const mostActive = [...eligible].sort((a,b)=>PER_PLAYER[b].count-PER_PLAYER[a].count)[0];
-
-  el.innerHTML = `
-    <div class="panel stage-feature glow">
-      <div class="feature-eyebrow">${eyebrow}</div>
-      <div class="feature-name" style="color:${featCol}">${featured}</div>
-      <div class="feature-tag">${tag}</div>
-      <div class="feature-stats">${featStatsHtml}</div>
-      ${activePlayer==='all' && featured!=='—' ? `<button class="feature-cta" type="button" onclick="setPlayer('${featured}')">View profile</button>` : ''}
-    </div>
-    <div class="panel gauge-panel">
-      <div class="panel-head" style="padding:0">
-        <h3>Performance</h3>
+  if (!sessions.length) {
+    el.innerHTML = '<div style="color:var(--muted);font-size:.82rem;padding:16px 0">No sessions found.</div>';
+    return;
+  }
+  el.innerHTML = sessions.map(s => {
+    const winner = s.players[0];
+    const winCol = COLORS[winner.player] || 'var(--accent)';
+    const d = s.date ? new Date(s.date + 'T12:00:00') : null;
+    const dateStr = d ? d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'2-digit'}) : '—';
+    const margin = s.players.length >= 2 && s.players[0].score != null && s.players[1].score != null
+      ? s.players[1].score - s.players[0].score : null;
+    const rows = s.players.map((p, i) => {
+      const col = COLORS[p.player] || 'var(--accent)';
+      return `<div class="sc-row">
+        <div class="sc-name">
+          <span class="player-dot" style="background:${col};color:${col}"></span>
+          <span>${p.player}</span>
+          ${i === 0 ? '<span class="sc-win">W</span>' : ''}
+        </div>
+        <div class="sc-score" style="color:${col}">${p.score ?? '—'}</div>
+      </div>`;
+    }).join('');
+    return `<div class="panel session-card" style="border-top-color:${winCol}">
+      <div>
+        <div class="sc-date">${dateStr}</div>
+        <div class="sc-course" title="${s.course}">${s.course}</div>
       </div>
-      ${gaugeSvg(gaugeVal, gaugeColor, gaugeLabel)}
-    </div>
-    <div class="panel">
-      <div class="panel-head"><h3>Group Pulse</h3></div>
-      <div class="statpair">
-        <div>
-          <div class="sp-label">Hottest Form</div>
-          <div class="sp-value">${hottest?hottest:'—'}</div>
-          <div class="sp-sub">${hottest?(PER_PLAYER[hottest].form_label||'')+(PER_PLAYER[hottest].form_diff!=null?` · ${PER_PLAYER[hottest].form_diff>0?'+':''}${fmt1(PER_PLAYER[hottest].form_diff)}`:''):''}</div>
-        </div>
-        <div>
-          <div class="sp-label">Most Consistent</div>
-          <div class="sp-value">${mostConsistent?mostConsistent:'—'}</div>
-          <div class="sp-sub">${mostConsistent?`σ ${PER_PLAYER[mostConsistent].std18} · grade ${PER_PLAYER[mostConsistent].grade}`:''}</div>
-        </div>
-        <div>
-          <div class="sp-label">Most Active</div>
-          <div class="sp-value">${mostActive?mostActive:'—'}</div>
-          <div class="sp-sub">${mostActive?`${PER_PLAYER[mostActive].count} rounds`:''}</div>
-        </div>
-        <div>
-          <div class="sp-label">Eligible</div>
-          <div class="sp-value">${eligible.length}/${PLAYERS.length}</div>
-          <div class="sp-sub">${MIN_ROUNDS}+ rounds</div>
+      <div class="sc-players">${rows}</div>
+      ${margin !== null ? `<div class="sc-margin">Won by ${margin} stroke${margin !== 1 ? 's' : ''}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ── Last Session Deep-Dive (Option C) ────────────────────────────────────────
+function renderLastSession() {
+  const el = document.getElementById('lastSession');
+  let sessions = RECENT_SESSIONS;
+  if (activePlayer !== 'all') {
+    sessions = sessions.filter(s => s.players.some(p => p.player === activePlayer));
+  }
+  if (!sessions.length) {
+    el.innerHTML = '<div style="color:var(--muted);font-size:.82rem;padding:16px 0">No session data.</div>';
+    return;
+  }
+  const s = sessions[0];
+  const winner = s.players[0];
+  const winCol = COLORS[winner.player] || 'var(--accent)';
+  const d = s.date ? new Date(s.date + 'T12:00:00') : null;
+  const dateStr = d ? d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}) : '—';
+  const margin = s.players.length >= 2 && s.players[0].score != null && s.players[1].score != null
+    ? s.players[1].score - s.players[0].score : null;
+
+  const scoreRows = s.players.map((p, i) => {
+    const col = COLORS[p.player] || 'var(--accent)';
+    const bg = i === 0 ? `background:${winCol}12` : 'background:rgba(255,255,255,.02)';
+    const bTag = p.birdies ? `<span class="lsr-birdie">${p.birdies} birdie${p.birdies !== 1 ? 's' : ''}</span>` : '';
+    return `<div class="lsr-srow" style="${bg}">
+      <div class="lsr-splayer">
+        <span class="player-dot" style="background:${col};color:${col}"></span>
+        <span style="color:${col}">${p.player}</span>
+        ${i === 0 ? `<span style="font-size:.55rem;color:${col};opacity:.7;letter-spacing:.12em;text-transform:uppercase;font-weight:700">WINNER</span>` : ''}
+      </div>
+      <div class="lsr-right">
+        ${bTag}
+        <div style="text-align:right">
+          <div class="lsr-gross" style="color:${col}">${p.score ?? '—'}</div>
+          ${p.net != null ? `<div class="lsr-net">net ${p.net}</div>` : ''}
         </div>
       </div>
     </div>`;
-}
+  }).join('');
 
-function gaugeSvg(value, color, label) {
-  const v = Math.max(0, Math.min(100, value));
-  const r = 70, cx = 80, cy = 80;
-  const start = Math.PI, end = 2*Math.PI;
-  const ang = start + (end-start) * (v/100);
-  const sx = cx + r*Math.cos(start), sy = cy + r*Math.sin(start);
-  const ex = cx + r*Math.cos(ang),   ey = cy + r*Math.sin(ang);
-  const ex2 = cx + r*Math.cos(end),  ey2 = cy + r*Math.sin(end);
-  const large = (ang-start) > Math.PI ? 1 : 0;
-  return `<div class="gauge-wrap">
-    <div class="gauge">
-      <svg viewBox="0 0 160 90" width="160" height="90" aria-label="Gauge">
-        <defs>
-          <linearGradient id="gg" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stop-color="${color}" stop-opacity="0.6"/>
-            <stop offset="100%" stop-color="${color}"/>
-          </linearGradient>
-        </defs>
-        <path d="M ${sx} ${sy} A ${r} ${r} 0 1 1 ${ex2} ${ey2}" fill="none" stroke="rgba(99,140,210,0.18)" stroke-width="10" stroke-linecap="round"/>
-        <path d="M ${sx} ${sy} A ${r} ${r} 0 ${large} 1 ${ex} ${ey}" fill="none" stroke="url(#gg)" stroke-width="10" stroke-linecap="round" style="filter:drop-shadow(0 0 6px ${color})"/>
-      </svg>
-      <div class="gauge-readout">
-        <div class="gr-num" style="color:${color}">${v}<span style="font-size:0.9rem;color:var(--muted)">%</span></div>
-        <div class="gr-cap">${label}</div>
+  // Stat comparison table — max per column drives bar width
+  const stats = [
+    ['GIR %',    p => p.gir_pct,               v => v + '%',       true ],
+    ['FIR %',    p => p.fir_pct,               v => v + '%',       true ],
+    ['Birdies',  p => p.birdies ?? 0,           v => v,             true ],
+    ['Bogeys',   p => p.bogeys ?? 0,            v => v,             false],
+    ['Doubles+', p => (p.doubles??0)+(p.others??0), v => v,        false],
+    ['Driving',  p => p.driving,                v => v + ' yd',    true ],
+  ];
+
+  const headerCells = s.players.map(p => {
+    const col = COLORS[p.player] || 'var(--accent)';
+    return `<th style="color:${col}">${p.player}</th>`;
+  }).join('');
+
+  const tableRows = stats.map(([label, getter, fmtr, higherBetter]) => {
+    const vals = s.players.map(getter);
+    const defined = vals.filter(v => v != null);
+    if (!defined.length) return '';
+    const maxVal = Math.max(...defined) || 1;
+    const best = higherBetter ? Math.max(...defined) : Math.min(...defined);
+    const cells = s.players.map((p, i) => {
+      const v = getter(p);
+      const col = COLORS[p.player] || 'var(--accent)';
+      const pct = v != null ? Math.round(v / maxVal * 100) : 0;
+      const isBest = v != null && v === best;
+      return `<td>
+        <div class="lst-bar-wrap">
+          <span style="min-width:46px;font-weight:${isBest?700:400};color:${isBest?col:'var(--text-dim)'}">${v != null ? fmtr(v) : '—'}</span>
+          <div class="lst-bar-bg"><div class="lst-bar-fill" style="width:${pct}%;background:${col}"></div></div>
+        </div>
+      </td>`;
+    }).join('');
+    return `<tr><td class="lst-stat-label">${label}</td>${cells}</tr>`;
+  }).filter(Boolean).join('');
+
+  el.innerHTML = `
+    <div class="panel lsr-wrap" style="background:radial-gradient(ellipse 80% 120% at 90% 10%,${winCol}18 0%,transparent 55%),var(--panel)">
+      <div>
+        <div class="lsr-eyebrow">Last Session</div>
+        <div class="lsr-course">${s.course}</div>
+        <div class="lsr-date">${dateStr}</div>
       </div>
+      <div class="lsr-winner-row">
+        <div class="lsr-winner" style="color:${winCol}">${winner.player}</div>
+        ${margin !== null ? `<div class="lsr-margin">won by ${margin} stroke${margin !== 1 ? 's' : ''}</div>` : ''}
+      </div>
+      <div class="lsr-scores">${scoreRows}</div>
     </div>
-  </div>`;
+    <div class="panel" style="padding:0">
+      <div class="panel-head" style="padding:16px 18px 0"><h3>Shot Stats Comparison</h3></div>
+      <div class="lst-wrap" style="padding:8px 0 16px">
+        <table class="lst-table">
+          <thead><tr><th></th>${headerCells}</tr></thead>
+          <tbody>${tableRows}</tbody>
+        </table>
+      </div>
+    </div>`;
 }
 
 function courseRank(p) {
@@ -1705,6 +1717,45 @@ function updateVolumeChart() {
   volumeChart.options.plugins.legend.display = activePlayer==='all';
   volumeChart.update('none');
 }
+
+// ── auto-refresh: reload when new data is pushed to GitHub ───────────────────
+(function() {
+  const BUILT_AT   = '2026-05-03T22:34:53Z';
+  const POLL_MS    = 60_000;   // check every 60 s
+  const RELOAD_MS  = 3_000;    // brief pause before reloading
+
+  let banner = null;
+
+  function showBanner() {
+    if (banner) return;
+    banner = document.createElement('div');
+    banner.style.cssText = [
+      'position:fixed','bottom:1rem','right:1rem','z-index:9999',
+      'background:#4f8bff','color:#fff','padding:.6rem 1.2rem',
+      'border-radius:.5rem','font:600 13px/1 Inter,sans-serif',
+      'box-shadow:0 4px 16px rgba(0,0,0,.4)',
+      'transition:opacity .3s'
+    ].join(';');
+    banner.textContent = 'New data available — refreshing…';
+    document.body.appendChild(banner);
+  }
+
+  function check() {
+    fetch('data/last_updated.json?v=' + Date.now(), {cache:'no-store'})
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(j) {
+        if (j && j.updated_at > BUILT_AT) {
+          showBanner();
+          setTimeout(function(){ window.location.reload(); }, RELOAD_MS);
+        } else {
+          setTimeout(check, POLL_MS);
+        }
+      })
+      .catch(function(){ setTimeout(check, POLL_MS); });
+  }
+
+  setTimeout(check, POLL_MS);
+})();
 </script>
 </body>
 </html>
