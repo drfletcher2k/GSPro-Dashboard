@@ -36,7 +36,6 @@ COLORS = {
     'Jack':      '#a78bfa',
     'Baumbach':  '#22d3ee',
     'Dapp':      '#f472b6',
-    'Mad':       '#34d399',
     'Maddox':    '#34d399',
     'Dan/Thom':  '#fb923c',
     'Albert':    '#fb923c',
