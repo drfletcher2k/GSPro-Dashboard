@@ -294,7 +294,8 @@ PERP_J     = jd(per_player)
 H2H_J      = jd(h2h_matrix)
 COURSES_J  = jd(top_courses)
 MONTHLY_J  = jd(monthly)
-GENERATED  = datetime.now().strftime('%Y-%m-%d %H:%M')
+GENERATED     = datetime.now().strftime('%Y-%m-%d %H:%M')
+GENERATED_ISO = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
 
 # ── HTML template ─────────────────────────────────────────────────────────────
 TEMPLATE = r"""<!DOCTYPE html>
@@ -2004,6 +2005,45 @@ function updateVolumeChart() {
   volumeChart.options.plugins.legend.display = activePlayer==='all';
   volumeChart.update('none');
 }
+
+// ── auto-refresh: reload when new data is pushed to GitHub ───────────────────
+(function() {
+  const BUILT_AT   = '__GENERATED_ISO__';
+  const POLL_MS    = 60_000;   // check every 60 s
+  const RELOAD_MS  = 3_000;    // brief pause before reloading
+
+  let banner = null;
+
+  function showBanner() {
+    if (banner) return;
+    banner = document.createElement('div');
+    banner.style.cssText = [
+      'position:fixed','bottom:1rem','right:1rem','z-index:9999',
+      'background:#4f8bff','color:#fff','padding:.6rem 1.2rem',
+      'border-radius:.5rem','font:600 13px/1 Inter,sans-serif',
+      'box-shadow:0 4px 16px rgba(0,0,0,.4)',
+      'transition:opacity .3s'
+    ].join(';');
+    banner.textContent = 'New data available — refreshing…';
+    document.body.appendChild(banner);
+  }
+
+  function check() {
+    fetch('data/last_updated.json?v=' + Date.now(), {cache:'no-store'})
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(j) {
+        if (j && j.updated_at > BUILT_AT) {
+          showBanner();
+          setTimeout(function(){ window.location.reload(); }, RELOAD_MS);
+        } else {
+          setTimeout(check, POLL_MS);
+        }
+      })
+      .catch(function(){ setTimeout(check, POLL_MS); });
+  }
+
+  setTimeout(check, POLL_MS);
+})();
 </script>
 </body>
 </html>"""
@@ -2015,9 +2055,10 @@ TEMPLATE = TEMPLATE.replace('__PERP__',        PERP_J)
 TEMPLATE = TEMPLATE.replace('__H2H__',         H2H_J)
 TEMPLATE = TEMPLATE.replace('__COURSES__',     COURSES_J)
 TEMPLATE = TEMPLATE.replace('__MONTHLY__',     MONTHLY_J)
-TEMPLATE = TEMPLATE.replace('__GENERATED__',   GENERATED)
-TEMPLATE = TEMPLATE.replace('__ROUND_COUNT__', str(len(rounds)))
-TEMPLATE = TEMPLATE.replace('__PLAYER_COUNT__',str(len(PLAYERS)))
+TEMPLATE = TEMPLATE.replace('__GENERATED__',     GENERATED)
+TEMPLATE = TEMPLATE.replace('__GENERATED_ISO__', GENERATED_ISO)
+TEMPLATE = TEMPLATE.replace('__ROUND_COUNT__',   str(len(rounds)))
+TEMPLATE = TEMPLATE.replace('__PLAYER_COUNT__',  str(len(PLAYERS)))
 
 with open(OUT, 'w', encoding='utf-8') as f:
     f.write(TEMPLATE)
