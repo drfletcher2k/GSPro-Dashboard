@@ -458,6 +458,25 @@ button.matrix-cell { display:inline-block; width:100%; }
 .shot-stat-fill { height:100%; border-radius:3px; }
 .player-dot { display:inline-block; width:8px; height:8px; border-radius:50%; flex-shrink:0; box-shadow:0 0 6px currentColor; }
 
+/* ── Deep metrics 4-col grid ─────────────────────────────── */
+.deep-metrics-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+@media(max-width:1100px){ .deep-metrics-grid{ grid-template-columns:repeat(2,1fr); } }
+@media(max-width:600px) { .deep-metrics-grid{ grid-template-columns:1fr; } }
+
+/* ── Tooltip ─────────────────────────────────────────────── */
+.has-tip { position:relative; display:inline-flex; align-items:center; gap:5px; }
+.tip-icon { width:13px; height:13px; border-radius:50%; background:rgba(255,255,255,0.1);
+  color:var(--muted); font-size:0.6rem; font-weight:700; display:grid; place-items:center;
+  cursor:help; flex-shrink:0; line-height:1; }
+.has-tip .tip-box {
+  display:none; position:absolute; bottom:calc(100% + 7px); left:50%; transform:translateX(-50%);
+  background:var(--panel); border:1px solid var(--line-hi); border-radius:8px;
+  padding:9px 11px; font-size:0.71rem; color:var(--text-dim); line-height:1.5;
+  width:230px; z-index:200; pointer-events:none; white-space:normal;
+  box-shadow:0 8px 24px rgba(0,0,0,0.4);
+}
+.has-tip:hover .tip-box { display:block; }
+
 /* ── Insights ────────────────────────────────────────────── */
 .insights-grid {
   display:grid;
@@ -549,7 +568,7 @@ footer .fl { display:flex; align-items:center; gap:8px; }
     <div class="topbar">
       <div class="crumbs">Dashboard · <strong id="crumbCtx">All Players</strong></div>
       <div class="topbar-spacer"></div>
-      <div class="topbar-tag"><span class="live-dot" aria-hidden="true"></span><span>Synced 2026-05-03 23:21</span></div>
+      <div class="topbar-tag"><span class="live-dot" aria-hidden="true"></span><span>Synced 2026-05-04 15:52</span></div>
     </div>
 
     <!-- KPI strip -->
@@ -589,12 +608,12 @@ footer .fl { display:flex; align-items:center; gap:8px; }
     <!-- Deep Dive -->
     <section aria-labelledby="dd-title">
       <div class="section-title" id="dd-title"><span class="st-accent">Deep Dive</span></div>
-      <div class="analytics-grid">
+      <div style="display:flex;flex-direction:column;gap:14px;">
         <div class="panel chart-card">
           <div class="panel-head"><h3>Strokes vs Personal Baseline</h3></div>
           <div style="padding:0 18px 18px"><canvas id="baselineChart" style="max-height:300px"></canvas></div>
         </div>
-        <div class="panel shot-bar-section" id="deepDiveStats"></div>
+        <div id="deepDiveStats"></div>
       </div>
     </section>
 
@@ -657,7 +676,7 @@ footer .fl { display:flex; align-items:center; gap:8px; }
 
     <footer>
       <div class="fl"><span class="live-dot" aria-hidden="true"></span><span>GSPro Analytics</span></div>
-      <div>Generated 2026-05-03 23:21 · 234 rounds · 7 players</div>
+      <div>Generated 2026-05-04 15:52 · 234 rounds · 7 players</div>
     </footer>
 
   </main>
@@ -1470,13 +1489,12 @@ function renderDeepDiveStats() {
   const el = document.getElementById('deepDiveStats');
   const players = rankedPlayers();
   const stats = [
-    { key:'last_vs_baseline', label:'Last Round vs Baseline', suffix:' strokes', lower:true, signed:true },
-    { key:'std10', label:'Volatility Index (last 10)', suffix:' σ', lower:true },
-    { key:'blowup_recent18', label:'Blow-up Holes (last 5 avg)', suffix:' / round', lower:true },
-    { key:'birdies_recent18', label:'Birdie+ Rate (last 5 avg)', suffix:' / round', lower:false },
-    { key:'sim_index', label:'Simulator Index Estimate', suffix:'', lower:true },
+    { key:'std10',           label:'Volatility Index',      tip:'Standard deviation of scores over the last 10 18H rounds. Lower = more consistent.', suffix:' σ',       lower:true },
+    { key:'blowup_recent18', label:'Blow-up Rate',          tip:'Average double bogeys or worse per round, calculated over your last 5 rounds.',       suffix:' / round', lower:true },
+    { key:'birdies_recent18',label:'Birdie+ Rate',          tip:'Average birdies and eagles per round, calculated over your last 5 rounds.',           suffix:' / round', lower:false },
+    { key:'sim_index',       label:'Simulator Index',       tip:'Handicap-style estimate. Differential per round = (score − rating) × 113 ÷ slope. Best 8 of last 20 differentials, averaged × 0.96. Requires rating/slope data; not an official handicap.', suffix:'', lower:true },
   ];
-  el.innerHTML = `<h3>Deep Metrics — 18H Only</h3>` + stats.map(st=>{
+  const panels = stats.map(st=>{
     const rows = players
       .filter(p=>PER_PLAYER[p][st.key]!=null)
       .sort((a,b)=>st.lower ? PER_PLAYER[a][st.key]-PER_PLAYER[b][st.key] : PER_PLAYER[b][st.key]-PER_PLAYER[a][st.key])
@@ -1493,8 +1511,10 @@ function renderDeepDiveStats() {
           </div>
         </div>`;
       }).join('');
-    return `<div><div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:8px">${st.label}</div>${rows || '<div class="no-data">Not enough data</div>'}</div>`;
-  }).join('');
+    const labelHtml = `<span class="has-tip" style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted)">${st.label}<span class="tip-icon">?</span><span class="tip-box">${st.tip}</span></span>`;
+    return `<div class="panel shot-bar-section"><div style="margin-bottom:8px">${labelHtml}</div>${rows || '<div class="no-data">Not enough data</div>'}</div>`;
+  });
+  el.innerHTML = `<div class="deep-metrics-grid">${panels.join('')}</div>`;
 }
 
 // ── Insights ──────────────────────────────────────────────────────────────────
@@ -1546,7 +1566,7 @@ function renderInsights() {
     const byBird = [...eligible].filter(p=>PER_PLAYER[p].birdies_recent18!=null).sort((a,b)=>PER_PLAYER[b].birdies_recent18-PER_PLAYER[a].birdies_recent18);
     if (byBird[0]) cards.push(insightCard('dove','Birdie Heat',byBird[0],`${fmt1(PER_PLAYER[byBird[0]].birdies_recent18)} / rd`,`Birdies plus eagles, last 5 rounds`,'var(--gold)'));
     const byIndex = [...eligible].filter(p=>PER_PLAYER[p].sim_index!=null).sort((a,b)=>PER_PLAYER[a].sim_index-PER_PLAYER[b].sim_index);
-    if (byIndex[0]) cards.push(insightCard('ruler','Lowest Sim Index',byIndex[0],fmt1(PER_PLAYER[byIndex[0]].sim_index),`Best differentials, last 20 rounds`,'var(--accent)'));
+    if (byIndex[0]) cards.push(insightCard('ruler','Lowest Sim Index',byIndex[0],fmt1(PER_PLAYER[byIndex[0]].sim_index),`Best differentials, last 20 rounds`,'var(--accent)','Handicap-style estimate. Differential per round = (score − rating) × 113 ÷ slope. Best 8 of last 20 differentials, averaged × 0.96. Requires rating/slope data; not an official handicap.'));
 
   } else {
     const p  = activePlayer;
@@ -1567,7 +1587,7 @@ function renderInsights() {
     if (pp.last_vs_baseline!=null) cards.push(insightCard('ruler','Vs Personal Baseline',`${pp.last_vs_baseline>0?'+':''}${fmt1(pp.last_vs_baseline)}`,`Last round vs prior 10-round avg`,pp.last_vs_baseline<0?'Better than baseline':'Above baseline',pp.last_vs_baseline<0?'var(--green)':'var(--gold)'));
     if (pp.blowup_recent18!=null) cards.push(insightCard('shield','Blow-up Rate',`${fmt1(pp.blowup_recent18)} / rd`,`Double bogeys or worse, last 5 rounds`,`Season avg ${fmt1(pp.blowup_avg18)} per round`,col));
     if (pp.birdies_recent18!=null) cards.push(insightCard('dove','Birdie+ Trend',`${fmt1(pp.birdies_recent18)} / rd`,`Birdies plus eagles, last 5 rounds`,pp.birdies_prior18!=null?`Prior avg ${fmt1(pp.birdies_prior18)} per round`:'',col));
-    if (pp.sim_index!=null) cards.push(insightCard('ruler','Simulator Index',fmt1(pp.sim_index),`Handicap-style estimate`,`Uses rating/slope data; not official`,col));
+    if (pp.sim_index!=null) cards.push(insightCard('ruler','Simulator Index',fmt1(pp.sim_index),`Handicap-style estimate`,`Uses rating/slope data; not official`,col,'Differential per round = (score − rating) × 113 ÷ slope. Best 8 of last 20 differentials, averaged × 0.96. Requires rating/slope data; not an official handicap.'));
     if (pp.peak) cards.push(insightCard('trophy','Peak Form Window',`${pp.peak.avg} avg`,`Best 5-round stretch`,`Ending ${pp.peak.end}`,col));
     if (pp.form_label) cards.push(insightCard('trend','Current Form',pp.form_label,`${pp.form_diff>0?'+':''}${fmt1(pp.form_diff)} strokes`,`vs season average (last 5 rounds, 18H)`,pp.form_diff>0?'var(--green)':'var(--red)'));
     if (pp.solo_avg18!=null&&pp.group_avg18!=null) {
@@ -1585,15 +1605,18 @@ function renderInsights() {
   el.innerHTML = cards.join('');
 }
 
-function insightCard(icon, label, main, sub, extra, color='var(--accent)') {
+function insightCard(icon, label, main, sub, extra, color='var(--accent)', tip='') {
   if (!main) return '';
   const safeColor = color.startsWith('#') ? color : color;
   const isHex = color.startsWith('#');
   const borderTint = isHex ? hexAlpha(color, 0.30) : 'var(--line-hi)';
+  const labelHtml = tip
+    ? `<span class="has-tip">${label}<span class="tip-icon">?</span><span class="tip-box">${tip}</span></span>`
+    : label;
   return `<div class="panel insight-card" style="border-color:${borderTint}">
     <div class="ic-tag">
       <span class="ic-mark" style="color:${safeColor};background: color-mix(in srgb, ${safeColor} 14%, transparent);">${svgIcon(icon)}</span>
-      <span>${label}</span>
+      <span>${labelHtml}</span>
     </div>
     <div class="ic-main" style="color:${safeColor}">${main}</div>
     <div class="ic-sub">${sub}</div>
@@ -1720,7 +1743,7 @@ function updateVolumeChart() {
 
 // ── auto-refresh: reload when new data is pushed to GitHub ───────────────────
 (function() {
-  const BUILT_AT   = '2026-05-03T23:21:45Z';
+  const BUILT_AT   = '2026-05-04T15:52:03Z';
   const POLL_MS    = 60_000;   // check every 60 s
   const RELOAD_MS  = 3_000;    // brief pause before reloading
 
