@@ -558,7 +558,7 @@ footer .fl { display:flex; align-items:center; gap:8px; }
     <div class="topbar">
       <div class="crumbs">Dashboard · <strong id="crumbCtx">All Players</strong></div>
       <div class="topbar-spacer"></div>
-      <div class="topbar-tag"><span class="live-dot" aria-hidden="true"></span><span>Synced 2026-05-03 17:36</span></div>
+      <div class="topbar-tag"><span class="live-dot" aria-hidden="true"></span><span>Synced 2026-05-04 10:38</span></div>
     </div>
 
     <!-- KPI strip -->
@@ -656,7 +656,7 @@ footer .fl { display:flex; align-items:center; gap:8px; }
 
     <footer>
       <div class="fl"><span class="live-dot" aria-hidden="true"></span><span>GSPro Analytics</span></div>
-      <div>Generated 2026-05-03 17:36 · 234 rounds · 7 players</div>
+      <div>Generated 2026-05-04 10:38 · 234 rounds · 7 players</div>
     </footer>
 
   </main>
@@ -1705,6 +1705,45 @@ function updateVolumeChart() {
   volumeChart.options.plugins.legend.display = activePlayer==='all';
   volumeChart.update('none');
 }
+
+// ── auto-refresh: reload when new data is pushed to GitHub ───────────────────
+(function() {
+  const BUILT_AT   = '2026-05-04T10:38:52Z';
+  const POLL_MS    = 60_000;   // check every 60 s
+  const RELOAD_MS  = 3_000;    // brief pause before reloading
+
+  let banner = null;
+
+  function showBanner() {
+    if (banner) return;
+    banner = document.createElement('div');
+    banner.style.cssText = [
+      'position:fixed','bottom:1rem','right:1rem','z-index:9999',
+      'background:#4f8bff','color:#fff','padding:.6rem 1.2rem',
+      'border-radius:.5rem','font:600 13px/1 Inter,sans-serif',
+      'box-shadow:0 4px 16px rgba(0,0,0,.4)',
+      'transition:opacity .3s'
+    ].join(';');
+    banner.textContent = 'New data available — refreshing…';
+    document.body.appendChild(banner);
+  }
+
+  function check() {
+    fetch('data/last_updated.json?v=' + Date.now(), {cache:'no-store'})
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(j) {
+        if (j && j.updated_at > BUILT_AT) {
+          showBanner();
+          setTimeout(function(){ window.location.reload(); }, RELOAD_MS);
+        } else {
+          setTimeout(check, POLL_MS);
+        }
+      })
+      .catch(function(){ setTimeout(check, POLL_MS); });
+  }
+
+  setTimeout(check, POLL_MS);
+})();
 </script>
 </body>
 </html>
