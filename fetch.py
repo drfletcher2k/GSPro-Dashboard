@@ -65,7 +65,7 @@ def get_players(opener):
 
 def fetch_player(opener, player_id):
     params = urllib.parse.urlencode({
-        "selectedPlayer": player_id, "analyticsType": "Rounds", "refreshCache": "false"
+        "selectedPlayer": player_id, "analyticsType": "Rounds", "refreshCache": "true"
     })
     url = f"{BASE}/analytics/rounds/LoadData?{params}"
     req = urllib.request.Request(url, headers={
