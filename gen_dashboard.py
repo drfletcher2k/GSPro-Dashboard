@@ -379,6 +379,7 @@ TEMPLATE = r"""<!DOCTYPE html>
   --bg-0:        #05080f;          /* canvas */
   --bg-1:        #0a1020;          /* shell */
   --bg-2:        #0f172a;          /* panel */
+  --panel:       #0f172a;          /* solid panel bg for elements that must sit above other content (tooltips) */
   --bg-3:        #131c33;          /* panel inner */
   --bg-hi:       #1a2547;          /* hover/selected */
   --line:        rgba(99,140,210,0.12);
@@ -840,6 +841,10 @@ button.matrix-cell { display:inline-block; width:100%; }
   box-shadow:0 8px 24px rgba(0,0,0,0.4);
 }
 .has-tip:hover .tip-box { display:block; }
+/* .panel clips overflow for its gradient background, but that also clipped
+   tooltips that pop up above cards containing them — let those specific
+   cards show overflow so the tip-box isn't cut off. */
+.panel.shot-bar-section, .panel.insight-card { overflow:visible; }
 
 /* ── Insights ────────────────────────────────────────────── */
 .insights-grid {
