@@ -311,7 +311,30 @@ for _rid, _entries in _sessions_by_id.items():
         continue
     _date = max(e['date'] for e in _entries if e.get('date')) or ''
     _course = _entries[0].get('course', '')
-    _players = sorted(_entries, key=lambda e: (e.get('score') or 999))
+    # Sort by gross score, then net score (the standard tiebreak when gross
+    # scores match), then name — so display order is deterministic even on
+    # a full tie, instead of relying on incidental fetch order.
+    _players = sorted(_entries, key=lambda e: (
+        e.get('score') if e.get('score') is not None else 999,
+        e.get('net') if e.get('net') is not None else 999,
+        e.get('player') or '',
+    ))
+
+    # Determine winner(s): lowest gross score; if tied, lowest net score wins;
+    # if still tied (or net unavailable), it's a genuine tie and all of them win.
+    _scores = [e.get('score') for e in _players if e.get('score') is not None]
+    _min_score = min(_scores) if _scores else None
+    _tied = [e for e in _players if e.get('score') == _min_score] if _min_score is not None else []
+    if len(_tied) > 1:
+        _nets = [e.get('net') for e in _tied if e.get('net') is not None]
+        if len(_nets) == len(_tied):
+            _min_net = min(_nets)
+            _winners = {id(e) for e in _tied if e.get('net') == _min_net}
+        else:
+            _winners = {id(e) for e in _tied}
+    else:
+        _winners = {id(e) for e in _tied}
+
     _session_list.append({
         'roundId': _rid,
         'date': _date,
@@ -328,6 +351,7 @@ for _rid, _entries in _sessions_by_id.items():
             'gir_pct':  _safe_pct(e.get('greensInReg', 0), e.get('greensTarget')),
             'fir_pct':  _safe_pct(e.get('fairwaysHit', 0), e.get('fairwaysTarget')),
             'driving':  round(float(e['drivingDistLongest'])) if e.get('drivingDistLongest') else None,
+            'isWinner': id(e) in _winners,
         } for e in _players],
     })
 
@@ -1224,6 +1248,28 @@ function renderKpiStrip() {
   ].join('');
 }
 
+// Shared winner/margin resolution for a session — players are pre-sorted by
+// gross score, then net (tiebreak), then name; `isWinner` is precomputed
+// server-side using that same tiebreak so a real tie shows as a tie.
+function sessionResult(s) {
+  const winners = s.players.filter(p => p.isWinner);
+  const winCol = COLORS[winners[0] && winners[0].player] || 'var(--accent)';
+  let marginText = null;
+  if (winners.length > 1) {
+    marginText = 'Tied';
+  } else if (s.players.length >= 2 && s.players[0].score != null && s.players[1].score != null) {
+    const scoreDiff = s.players[1].score - s.players[0].score;
+    if (scoreDiff > 0) {
+      marginText = `won by ${scoreDiff} stroke${scoreDiff !== 1 ? 's' : ''}`;
+    } else if (s.players[0].net != null && s.players[1].net != null) {
+      marginText = `won on net, ${s.players[0].net} to ${s.players[1].net}`;
+    } else {
+      marginText = 'won on tiebreak';
+    }
+  }
+  return { winners, winCol, marginText };
+}
+
 // ── Recent Sessions Feed (Option A) ──────────────────────────────────────────
 function renderSessionsFeed() {
   const el = document.getElementById('sessionsFeed');
@@ -1236,19 +1282,16 @@ function renderSessionsFeed() {
     return;
   }
   el.innerHTML = sessions.map(s => {
-    const winner = s.players[0];
-    const winCol = COLORS[winner.player] || 'var(--accent)';
+    const { winCol, marginText } = sessionResult(s);
     const d = s.date ? new Date(s.date + 'T12:00:00') : null;
     const dateStr = d ? d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'2-digit'}) : '—';
-    const margin = s.players.length >= 2 && s.players[0].score != null && s.players[1].score != null
-      ? s.players[1].score - s.players[0].score : null;
-    const rows = s.players.map((p, i) => {
+    const rows = s.players.map(p => {
       const col = COLORS[p.player] || 'var(--accent)';
       return `<div class="sc-row">
         <div class="sc-name">
           <span class="player-dot" style="background:${col};color:${col}"></span>
           <span>${p.player}</span>
-          ${i === 0 ? '<span class="sc-win">W</span>' : ''}
+          ${p.isWinner ? '<span class="sc-win">W</span>' : ''}
         </div>
         <div class="sc-score" style="color:${col}">${p.score ?? '—'}</div>
       </div>`;
@@ -1259,7 +1302,7 @@ function renderSessionsFeed() {
         <div class="sc-course" title="${s.course}">${s.course}</div>
       </div>
       <div class="sc-players">${rows}</div>
-      ${margin !== null ? `<div class="sc-margin">Won by ${margin} stroke${margin !== 1 ? 's' : ''}</div>` : ''}
+      ${marginText ? `<div class="sc-margin">${marginText.charAt(0).toUpperCase()}${marginText.slice(1)}</div>` : ''}
     </div>`;
   }).join('');
 }
@@ -1276,22 +1319,20 @@ function renderLastSession() {
     return;
   }
   const s = sessions[0];
-  const winner = s.players[0];
-  const winCol = COLORS[winner.player] || 'var(--accent)';
+  const { winners, winCol, marginText } = sessionResult(s);
   const d = s.date ? new Date(s.date + 'T12:00:00') : null;
   const dateStr = d ? d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}) : '—';
-  const margin = s.players.length >= 2 && s.players[0].score != null && s.players[1].score != null
-    ? s.players[1].score - s.players[0].score : null;
+  const winnerNames = winners.map(w => w.player).join(' & ') || '—';
 
-  const scoreRows = s.players.map((p, i) => {
+  const scoreRows = s.players.map(p => {
     const col = COLORS[p.player] || 'var(--accent)';
-    const bg = i === 0 ? `background:${winCol}12` : 'background:rgba(255,255,255,.02)';
+    const bg = p.isWinner ? `background:${winCol}12` : 'background:rgba(255,255,255,.02)';
     const bTag = p.birdies ? `<span class="lsr-birdie">${p.birdies} birdie${p.birdies !== 1 ? 's' : ''}</span>` : '';
     return `<div class="lsr-srow" style="${bg}">
       <div class="lsr-splayer">
         <span class="player-dot" style="background:${col};color:${col}"></span>
         <span style="color:${col}">${p.player}</span>
-        ${i === 0 ? `<span style="font-size:.55rem;color:${col};opacity:.7;letter-spacing:.12em;text-transform:uppercase;font-weight:700">WINNER</span>` : ''}
+        ${p.isWinner ? `<span style="font-size:.55rem;color:${col};opacity:.7;letter-spacing:.12em;text-transform:uppercase;font-weight:700">WINNER</span>` : ''}
       </div>
       <div class="lsr-right">
         ${bTag}
@@ -1347,8 +1388,8 @@ function renderLastSession() {
         <div class="lsr-date">${dateStr}</div>
       </div>
       <div class="lsr-winner-row">
-        <div class="lsr-winner" style="color:${winCol}">${winner.player}</div>
-        ${margin !== null ? `<div class="lsr-margin">won by ${margin} stroke${margin !== 1 ? 's' : ''}</div>` : ''}
+        <div class="lsr-winner" style="color:${winCol}">${winnerNames}</div>
+        ${marginText ? `<div class="lsr-margin">${marginText}</div>` : ''}
       </div>
       <div class="lsr-scores">${scoreRows}</div>
     </div>
@@ -2140,4 +2181,4 @@ with open(OUT, 'w', encoding='utf-8') as f:
     f.write(TEMPLATE)
 
 size_kb = os.path.getsize(OUT) // 1024
-print(f'✓ index.html → {size_kb} KB')
+print(f'OK index.html -> {size_kb} KB')
