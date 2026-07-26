@@ -266,6 +266,27 @@ main { display:flex; flex-direction:column; gap:18px; min-width:0; }
 .kpi-value { font-family:'Space Grotesk', sans-serif; font-size:1.45rem; font-weight:700; line-height:1.1; letter-spacing:-0.01em; }
 .kpi-sub   { font-size:0.7rem; color:var(--muted-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
+/* ── Hall of Fame ────────────────────────────────────────── */
+.hof-grid {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:14px;
+}
+@media(max-width:1100px){ .hof-grid{ grid-template-columns:repeat(2,1fr); } }
+@media(max-width:560px) { .hof-grid{ grid-template-columns:1fr; } }
+.hof-card {
+  padding:16px 18px; display:flex; flex-direction:column; gap:6px;
+  transition:transform .15s, border-color .15s;
+}
+.hof-card:hover { transform:translateY(-2px); border-color:var(--line-hi); }
+.hof-rank {
+  position:absolute; top:14px; right:16px;
+  font-family:'Space Grotesk',sans-serif; font-size:.8rem; font-weight:700; color:var(--muted);
+}
+.hof-rank.r1 { color:var(--gold); } .hof-rank.r2 { color:#cbd5e1; } .hof-rank.r3 { color:#b45309; }
+.hof-score { font-family:'Space Grotesk',sans-serif; font-size:2rem; font-weight:700; line-height:1; }
+.hof-player{ display:flex; align-items:center; gap:6px; font-size:.82rem; font-weight:600; }
+.hof-course{ font-size:.72rem; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.hof-sub   { font-size:.66rem; color:var(--muted); }
+
 /* ── Recent Sessions Feed (Option A) ────────────────────── */
 .sessions-feed {
   display:flex; gap:12px; overflow-x:auto; padding-bottom:6px;
@@ -573,12 +594,21 @@ footer .fl { display:flex; align-items:center; gap:8px; }
     <div class="topbar">
       <div class="crumbs">Dashboard · <strong id="crumbCtx">All Players</strong></div>
       <div class="topbar-spacer"></div>
-      <div class="topbar-tag"><span class="live-dot" aria-hidden="true"></span><span>Synced 2026-07-26 08:23</span></div>
+      <div class="topbar-tag"><span class="live-dot" aria-hidden="true"></span><span>Synced 2026-07-26 08:28</span></div>
     </div>
 
     <!-- KPI strip -->
     <section aria-label="Key metrics">
       <div class="kpi-strip" id="kpiStrip"></div>
+    </section>
+
+    <!-- Hall of Fame -->
+    <section aria-labelledby="hof-title">
+      <div class="section-title" id="hof-title">
+        <span class="st-accent">Hall of Fame</span>
+        <span class="panel-sub" style="margin-left:auto;text-transform:none;letter-spacing:0">4 lowest rounds all-time</span>
+      </div>
+      <div class="hof-grid" id="hallOfFame"></div>
     </section>
 
     <!-- Recent Sessions Feed (Option A) -->
@@ -681,7 +711,7 @@ footer .fl { display:flex; align-items:center; gap:8px; }
 
     <footer>
       <div class="fl"><span class="live-dot" aria-hidden="true"></span><span>GSPro Analytics</span></div>
-      <div>Generated 2026-07-26 08:23 · 250 rounds · 6 players</div>
+      <div>Generated 2026-07-26 08:28 · 250 rounds · 6 players</div>
     </footer>
 
   </main>
@@ -749,6 +779,7 @@ function initials(name){
 document.addEventListener('DOMContentLoaded', () => {
   renderPills();
   renderKpiStrip();
+  renderHallOfFame();
   renderSessionsFeed();
   renderLastSession();
   renderLeaderboard();
@@ -829,6 +860,7 @@ function setPlayer(p) {
   if (crumb) crumb.textContent = p==='all' ? 'All Players' : p;
   renderPills();
   renderKpiStrip();
+  renderHallOfFame();
   renderSessionsFeed();
   renderLastSession();
   renderLeaderboard();
@@ -909,6 +941,40 @@ function sessionResult(s) {
     }
   }
   return { winners, winCol, marginText };
+}
+
+// ── Hall of Fame ──────────────────────────────────────────────────────────────
+function renderHallOfFame() {
+  const el = document.getElementById('hallOfFame');
+  let qualifying = ROUNDS.filter(r => r.holeCount === 18 && r.score != null);
+  if (activePlayer !== 'all') qualifying = qualifying.filter(r => r.player === activePlayer);
+
+  const top = [...qualifying]
+    .sort((a,b) => (a.score - b.score) || ((a.net ?? 999) - (b.net ?? 999)))
+    .slice(0, 4);
+
+  if (!top.length) {
+    el.innerHTML = '<div style="color:var(--muted);font-size:.82rem;padding:16px 0">No rounds yet.</div>';
+    return;
+  }
+
+  el.innerHTML = top.map((r, i) => {
+    const rank = i + 1;
+    const rankClass = rank <= 3 ? `r${rank}` : '';
+    const col = COLORS[r.player] || 'var(--accent)';
+    const d = r.date ? new Date(r.date + 'T12:00:00') : null;
+    const dateStr = d ? d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'2-digit'}) : '—';
+    return `<div class="panel hof-card">
+      <span class="hof-rank ${rankClass}">${String(rank).padStart(2,'0')}</span>
+      <div class="hof-score" style="color:${col}">${r.score}</div>
+      <div class="hof-player">
+        <span class="player-dot" style="background:${col};color:${col}"></span>
+        <span style="color:${col}">${r.player}</span>
+      </div>
+      <div class="hof-course" title="${r.course}">${r.course}</div>
+      <div class="hof-sub">${dateStr}${r.net != null ? ` · net ${r.net}` : ''}</div>
+    </div>`;
+  }).join('');
 }
 
 // ── Recent Sessions Feed (Option A) ──────────────────────────────────────────
@@ -1765,7 +1831,7 @@ function updateVolumeChart() {
 
 // ── auto-refresh: reload when new data is pushed to GitHub ───────────────────
 (function() {
-  const BUILT_AT   = '2026-07-26T08:23:21Z';
+  const BUILT_AT   = '2026-07-26T08:28:28Z';
   const POLL_MS    = 60_000;   // check every 60 s
   const RELOAD_MS  = 3_000;    // brief pause before reloading
 
