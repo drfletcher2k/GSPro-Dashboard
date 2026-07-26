@@ -527,6 +527,27 @@ body {
   display:flex; justify-content:space-between; gap:8px;
 }
 
+.qual-info { flex-shrink:0; margin:6px 4px 0; }
+.qual-info summary {
+  list-style:none; cursor:pointer; user-select:none;
+  display:flex; align-items:center; gap:6px;
+  font-size:0.66rem; color:var(--muted); padding:4px;
+  border-radius:6px; transition:color .15s, background .15s;
+}
+.qual-info summary::-webkit-details-marker { display:none; }
+.qual-info summary:hover { color:var(--text-dim); background:rgba(99,140,210,0.07); }
+.qual-info[open] summary { color:var(--text-dim); }
+.qual-info .qi-icon {
+  width:14px; height:14px; border-radius:50%; background:rgba(255,255,255,0.1);
+  color:var(--muted); font-size:0.58rem; font-weight:700; display:grid; place-items:center;
+  flex-shrink:0; line-height:1;
+}
+.qual-body { font-size:0.66rem; color:var(--muted); line-height:1.6; padding:6px 6px 2px; }
+.qual-body b { color:var(--text-dim); font-weight:600; }
+.qual-body ul { margin:4px 0 10px 14px; padding:0; }
+.qual-body li { margin-bottom:2px; }
+.qual-body ul:last-child { margin-bottom:2px; }
+
 /* ── Main area ────────────────────────────────────────────── */
 main { display:flex; flex-direction:column; gap:18px; min-width:0; }
 
@@ -946,6 +967,23 @@ footer .fl { display:flex; align-items:center; gap:8px; }
     </div>
     <div class="roster-label">Roster</div>
     <nav class="roster" id="playerFilter" role="tablist" aria-label="Filter by player"></nav>
+    <details class="qual-info">
+      <summary><span class="qi-icon">?</span>What qualifies?</summary>
+      <div class="qual-body">
+        <b>A round counts if it's:</b>
+        <ul>
+          <li>18 holes</li>
+          <li>Not a par-3 course or tee</li>
+          <li>Not hidden from stats in GSPro</li>
+          <li>Logged as a real Round (not practice)</li>
+          <li>Played with at least one other person — solo rounds don't count</li>
+        </ul>
+        <b>A player counts if they've:</b>
+        <ul>
+          <li>Played 5+ qualifying rounds</li>
+        </ul>
+      </div>
+    </details>
     <div class="sidebar-foot">
       <span>__ROUND_COUNT__ rounds</span>
       <span>__PLAYER_COUNT__ players</span>
