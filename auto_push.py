@@ -1,6 +1,6 @@
 """
 auto_push.py – Stage changed dashboard outputs, commit with a timestamp, and
-push to GitHub.  Called by poll_and_update.py after a successful pipeline run.
+push to GitHub.  Called by runner.py after a successful pipeline run.
 
 Usage (standalone):
     python auto_push.py

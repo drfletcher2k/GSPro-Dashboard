@@ -5,3 +5,4 @@ data/filtered.json
 data/transformed.json
 __pycache__/
 *.pyc
+data/.update.lock

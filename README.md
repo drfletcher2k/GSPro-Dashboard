@@ -40,6 +40,14 @@ update.py    → data/latest.json         (deduped by player/round, solo rounds 
              → index.html               (regenerated)
 ```
 
+Automation on top of that pipeline:
+
+```
+watcher.py     waits for a round-end signal, then calls runner.py   (leave running)
+update_now.py  pushes an update on demand                           (the manual button)
+runner.py      shared check → update.py → auto_push.py logic + locking
+```
+
 ## Auto-Update (Live Dashboard)
 
 ### How a qualifying session is detected
@@ -51,41 +59,89 @@ A **qualifying round** is any session that appears in the GSPro Portal API
 - The same `roundId` is shared by **2 or more distinct players** (multiplayer / head-to-head)
 - No Par 3 tee designation
 
-There is no local GSPro log file required. The portal API is the source of truth:
-`fetch.py` authenticates and polls it directly. When the API returns a `(playerId, roundId)`
-pair that is not already in `data/latest.json`, a new qualifying round has been posted
-and the update pipeline fires.
+The portal API is the source of truth for round *data*: `fetch.py` authenticates and
+reads it. When the API returns a `(playerId, roundId)` pair that is not already in
+`data/latest.json`, a new qualifying round has been posted and the update pipeline fires.
+
+What the API cannot do is *tell you* a round finished — it is pull-only, with no
+webhook or callback. So the portal is not checked on a timer; it is checked when the
+sim PC produces a local signal that a round just ended (see below).
 
 ### How the GitHub repo updates automatically
 
-Run `poll_and_update.py` once and leave it in the background on the machine
-that plays GSPro:
+Run `watcher.py` once and leave it in the background on the machine that plays GSPro:
 
 ```
-python poll_and_update.py
+python watcher.py
 ```
 
-Every 5 minutes it:
-1. Calls `fetch.py → filter.py → transform.py` to get the latest round list
-2. Compares against `data/latest.json` to find genuinely new qualifying rounds
-3. If new rounds exist: runs `update.py` (regenerates dashboard), then calls
-   `auto_push.py` to commit and push `index.html`, `data/latest.json`, and
-   `data/last_updated.json` to GitHub
+It sits idle until something says a round finished, then runs
+`fetch.py → filter.py → transform.py`, compares against `data/latest.json`, and if
+there are genuinely new rounds runs `update.py` and `auto_push.py` to commit and push
+`index.html`, `data/latest.json`, and `data/last_updated.json`.
+
+**Triggers, in order of usefulness:**
+
+| Trigger | Reliability | Notes |
+|---|---|---|
+| Round-end line in GSPro's log | Best effort | GSPro's log wording is undocumented — see tuning below |
+| GSPro exits | Reliable | Closing the suite always flushes the round to the portal |
+| `Ctrl+Alt+G` hotkey | Manual | Global — works while GSPro is fullscreen |
+| Safety-net check | Backstop | Every 60 min by default; set `SAFETY_NET_MINUTES=0` to disable |
+
+Multiple signals for the same round are coalesced into one update. Because the portal
+receives a round a few seconds *after* GSPro uploads it, a round-end signal that finds
+nothing new is retried at 60s, 180s, and 300s before giving up.
+
+**Tuning the round-end log trigger.** GSPro does not document what it writes when a
+round ends, so the default pattern is a guess. To find the real line, run:
+
+```
+python watcher.py --tail
+```
+
+then finish a round and watch the output — lines matching the current pattern are
+marked `>>`. Once you spot the actual round-end line, set `GSPRO_ROUND_END_PATTERN`
+to a regex matching it. If no GSPro log is found at all, this trigger disables itself
+and the other three still work.
 
 **Optional environment variables:**
 
 | Variable | Default | Description |
 |---|---|---|
-| `POLL_INTERVAL_MINUTES` | `5` | How often to check the API |
+| `GSPRO_ROUND_END_PATTERN` | see `watcher.py` | Regex marking a finished round |
+| `GSPRO_LOG_PATH` | auto-detected | Explicit path to the GSPro log to tail |
+| `SAFETY_NET_MINUTES` | `60` | Backstop check interval; `0` disables |
+| `POST_ROUND_DELAY_SEC` | `30` | Wait after a round-end signal before checking |
+| `PROCESS_POLL_SEC` | `20` | How often to check whether GSPro is running |
+| `HOTKEY_ENABLED` | `1` | Set `0` to skip registering `Ctrl+Alt+G` |
 | `GIT_PUSH_BRANCH` | `main` | Branch to push updates to |
-| `ONLY_WHILE_GSPRO_RUNS` | `0` | Set `1` to skip polls when GSPro.exe is not detected |
 
-**PowerShell one-liner to start the poller minimised at login:**
+**PowerShell one-liner to start the watcher minimised at login:**
 ```powershell
-Start-Process python -ArgumentList "poll_and_update.py" -WorkingDirectory "C:\path\to\GSPro-Dashboard" -WindowStyle Minimized
+Start-Process python -ArgumentList "watcher.py" -WorkingDirectory "C:\path\to\GSPro-Dashboard" -WindowStyle Minimized
 ```
 
-Or add to Windows Task Scheduler: trigger = "At log on", action = `python poll_and_update.py`.
+Or add to Windows Task Scheduler: trigger = "At log on", action = `python watcher.py`.
+
+### Pushing an update by hand
+
+`Ctrl+Alt+G` while the watcher is running pushes an update immediately. If the watcher
+is *not* running, double-click **`update_now.bat`** (or pin a shortcut to it on the
+taskbar/desktop) — same effect, standalone:
+
+```
+python update_now.py
+```
+
+Both regenerate and push unconditionally rather than checking for new rounds first, so
+the button always produces a fresh deploy. They share a lock file with `watcher.py`, so
+it is safe to use one while the other is running.
+
+> **Why not a button inside GSPro?** GSPro is a closed-source Unity application with no
+> plugin or UI-extension API, so nothing here can add a button next to *Reset Launch
+> Monitor* / *Exit Suite*. The global hotkey is the closest equivalent: it fires while
+> GSPro is focused and fullscreen.
 
 ### How the GitHub Pages dashboard auto-refreshes
 
