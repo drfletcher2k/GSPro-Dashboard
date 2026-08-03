@@ -2,6 +2,8 @@
 
 > **CRITICAL INSTRUCTION FOR ALL AI AGENTS**: Read this file completely before inspecting or modifying code in this directory. Before completing your session, you MUST run existing tests and record your changes in the Session Log at the bottom.
 
+**Location**: `C:\ai-shared\gspro-dashboard` — dual-cloned on both KITCHEN (`DESKTOP-1O08HKV`) and OFFICE PCs. A pre-push hook fetches and blocks the push if this branch is behind its remote-tracking branch (pull first). Currently checked out on `wip/2026-08-02`, not `main` — see §4 for the `main`/`origin/main` divergence.
+
 ## 1. Project Identity & Purpose
 - **Core Stack**: Python 3.8+ (stdlib only — `urllib`, `json`, `http.cookiejar`; no third-party packages) for the data pipeline; static HTML/vanilla JS + Chart.js 4.4.0 (via CDN) for the dashboard frontend.
 - **Primary Objective**: Scrapes round/score data for a group of golfers from the GSPro Portal web app, filters it down to qualifying 18-hole multiplayer rounds, and regenerates a static analytics dashboard (`index.html`) that auto-publishes to GitHub Pages.
