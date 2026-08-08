@@ -3,6 +3,7 @@
 data/raw.json
 data/filtered.json
 data/transformed.json
+manual_update.log
 __pycache__/
 *.pyc
 data/.update.lock

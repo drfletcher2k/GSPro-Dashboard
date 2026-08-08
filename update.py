@@ -43,7 +43,7 @@ def run():
         json.dump(multi, f, separators=(",", ":"))
 
     size_kb = os.path.getsize(LATEST) / 1024
-    print(f"{len(multi)} rounds → data/latest.json ({size_kb:.1f} KB)")
+    print(f"{len(multi)} rounds -> data/latest.json ({size_kb:.1f} KB)")
 
     import gen_dashboard
     importlib.reload(gen_dashboard)
@@ -53,7 +53,7 @@ def run():
     stamp = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
     with open(LAST_UPDATED, "w") as f:
         json.dump({"updated_at": stamp, "round_count": len(multi)}, f)
-    print(f"data/last_updated.json → {stamp}")
+    print(f"data/last_updated.json -> {stamp}")
 
 if __name__ == "__main__":
     run()

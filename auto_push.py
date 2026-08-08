@@ -44,13 +44,13 @@ def main():
         print("Nothing to stage — skipping push.")
         return
 
-    r = _run(["git", "add"] + existing)
+    r = _run(["git", "add", "--"] + existing)
     if r.returncode != 0:
         print(f"git add failed: {r.stderr.strip()}")
         sys.exit(1)
 
-    # Commit (skip if nothing actually changed)
-    r = _run(["git", "commit", "-m", msg])
+    # Commit only the tracked output files; ignore unrelated staged changes.
+    r = _run(["git", "commit", "-m", msg, "--only", "--"] + existing)
     if r.returncode != 0:
         if "nothing to commit" in r.stdout + r.stderr:
             print("No changes — nothing to push.")
@@ -62,7 +62,7 @@ def main():
     # Push with retry (up to 4 attempts, exponential back-off)
     delay = 2
     for attempt in range(1, 5):
-        r = _run(["git", "push", "-u", "origin", BRANCH])
+        r = _run(["git", "push", "origin", f"HEAD:{BRANCH}"])
         if r.returncode == 0:
             print(f"Pushed to origin/{BRANCH}")
             return
