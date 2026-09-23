@@ -6,6 +6,7 @@ DIR          = os.path.dirname(os.path.abspath(__file__))
 LATEST       = os.path.join(DIR, "data", "latest.json")
 LAST_UPDATED = os.path.join(DIR, "data", "last_updated.json")
 TRANSFORMED  = os.path.join(DIR, "data", "transformed.json")
+MANUAL_ROUNDS = os.path.join(DIR, "data", "manual_rounds.json")
 
 def run():
     fetch.run()
@@ -14,6 +15,10 @@ def run():
 
     with open(TRANSFORMED) as f:
         rounds = json.load(f)
+
+    if os.path.exists(MANUAL_ROUNDS):
+        with open(MANUAL_ROUNDS) as f:
+            rounds.extend(json.load(f))
 
     seen, deduped = set(), []
     for r in rounds:

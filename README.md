@@ -33,9 +33,10 @@ Then open `http://localhost:8080/index.html`.
 
 ```
 fetch.py     → data/raw.json            (login + pull all players from GSPro Portal)
-filter.py    → data/filtered.json       (complete 18-hole rounds, no Par 3 tees, players ≥5 rounds)
+filter.py    → data/filtered.json       (complete 18-hole rounds, no Par 3 tees, players ≥10 rounds)
 transform.py → data/transformed.json   (flat objects, all fields)
 update.py    → data/latest.json         (deduped by player/round, solo rounds excluded)
+             ← data/manual_rounds.json  (official manually recorded results)
              → data/last_updated.json   (ISO timestamp used by browser auto-refresh)
              → index.html               (regenerated)
 ```

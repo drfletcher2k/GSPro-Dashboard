@@ -980,7 +980,7 @@ footer .fl { display:flex; align-items:center; gap:8px; }
         </ul>
         <b>A player counts if they've:</b>
         <ul>
-          <li>Played 5+ qualifying rounds</li>
+          <li>Played 10+ qualifying rounds</li>
         </ul>
       </div>
     </details>
@@ -1123,7 +1123,7 @@ footer .fl { display:flex; align-items:center; gap:8px; }
 // ── Embedded data ─────────────────────────────────────────────────────────────
 const ROUNDS      = __ROUNDS__;
 const PLAYERS     = __PLAYERS__;
-const MIN_ROUNDS  = 5;
+const MIN_ROUNDS  = 10;
 const COLORS      = __COLORS__;
 const PER_PLAYER  = __PERP__;
 const H2H         = __H2H__;
