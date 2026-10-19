@@ -5,7 +5,7 @@ RAW      = os.path.join(DIR, "data", "raw.json")
 FILTERED = os.path.join(DIR, "data", "filtered.json")
 
 VALID_HOLES = {18}
-MIN_ROUNDS = 5
+MIN_ROUNDS = 10
 EXCLUDED_TEE_TYPES = {"par3"}
 
 def is_complete(r):

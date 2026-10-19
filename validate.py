@@ -3,7 +3,7 @@ import json, os, sys
 DIR    = os.path.dirname(os.path.abspath(__file__))
 LATEST = os.path.join(DIR, "data", "latest.json")
 REQUIRED = {"roundId", "playerId", "player", "date", "course", "score", "holeCount", "fairwaysHit", "greensInReg"}
-MIN_ROUNDS = 5
+MIN_ROUNDS = 10
 EXCLUDED_TEE_TYPES = {"par3"}
 
 def run():
